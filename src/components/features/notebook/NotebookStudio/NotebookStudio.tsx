@@ -90,7 +90,7 @@ export function NotebookStudio() {
         showsVerticalScrollIndicator={false}
       >
         {/* Info Header Area */}
-        <View style={styles.infoArea}>
+        {/* <View style={styles.infoArea}>
           <View style={styles.tagRow}>
             <View style={styles.tag}>
               <Text style={styles.tagText}>Biology 101</Text>
@@ -102,7 +102,7 @@ export function NotebookStudio() {
             Master concepts through interactive AI study formats generated from
             your source materials.
           </Text>
-        </View>
+        </View> */}
 
         {/* Large Feature Card: Podcast Audio Overview */}
         <Pressable

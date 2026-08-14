@@ -1,7 +1,8 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import React, { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import { useGlobalAudioPlayer } from "@/context/AudioPlayerContext";
 import { styles } from "./PodcastAudioPlayer.styles";
 
 interface PodcastAudioPlayerProps {
@@ -9,16 +10,35 @@ interface PodcastAudioPlayerProps {
 }
 
 export function PodcastAudioPlayer({ fullAudioUrl }: PodcastAudioPlayerProps) {
-  const player = useAudioPlayer(fullAudioUrl);
-  const status = useAudioPlayerStatus(player);
+  const { id } = useLocalSearchParams();
+  const notebookId = id as string;
 
-  const isPlaying = status?.playing ?? false;
-  const currentTime = status?.currentTime ?? 0;
-  const totalDuration = status?.duration ?? 0;
+  const {
+    trackInfo,
+    loadTrack,
+    isPlaying,
+    currentTime,
+    duration: totalDuration,
+    playbackRate: playbackSpeed,
+    play,
+    pause,
+    skip,
+    setPlaybackRate,
+  } = useGlobalAudioPlayer();
 
   const waveformBarsCount = 36;
   const [heights, setHeights] = useState<number[]>([]);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+
+  useEffect(() => {
+    if (!trackInfo || trackInfo.url !== fullAudioUrl) {
+      loadTrack(
+        fullAudioUrl,
+        "Overview Podcast",
+        "AI-generated discussion",
+        notebookId,
+      );
+    }
+  }, [fullAudioUrl, trackInfo, notebookId]);
 
   useEffect(() => {
     const initialHeights = Array.from({ length: waveformBarsCount }).map(
@@ -44,29 +64,22 @@ export function PodcastAudioPlayer({ fullAudioUrl }: PodcastAudioPlayerProps) {
   }, [isPlaying]);
 
   const handlePlayPause = () => {
-    if (!player) return;
     if (isPlaying) {
-      player.pause();
+      pause();
     } else {
-      player.play();
+      play();
     }
   };
 
   const handleSkip = (seconds: number) => {
-    if (!player) return;
-    const target = currentTime + seconds;
-    const bounded = Math.max(0, Math.min(totalDuration, target));
-    player.seekTo(bounded);
+    skip(seconds);
   };
 
   const handleSpeedToggle = () => {
-    if (!player) return;
     const speeds = [1.0, 1.25, 1.5, 2.0];
     const currentIndex = speeds.indexOf(playbackSpeed);
     const nextSpeed = speeds[(currentIndex + 1) % speeds.length];
-    setPlaybackSpeed(nextSpeed);
-    player.shouldCorrectPitch = true;
-    player.playbackRate = nextSpeed;
+    setPlaybackRate(nextSpeed);
   };
 
   const formatTime = (seconds: number) => {

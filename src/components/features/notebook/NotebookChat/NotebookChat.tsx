@@ -1,3 +1,6 @@
+import BottomSheet from "@/components/BottomSheet";
+import { useSSE } from "@/context/SSEContext";
+import { apiClient } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -15,14 +18,10 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import BottomSheet from "@/components/BottomSheet";
-import { useSSE } from "@/context/SSEContext";
-import { apiClient } from "@/services/api";
-import { styles } from "./NotebookChat.styles";
-import { Message, CitationData } from "./types";
 import { MessageRow } from "./MessageRow/MessageRow";
+import { styles } from "./NotebookChat.styles";
+import { CitationData, Message } from "./types";
 import { TypingRow } from "./TypingRow/TypingRow";
-
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 export function NotebookChat() {
@@ -187,12 +186,7 @@ export function NotebookChat() {
 
   const renderItem = useCallback(
     ({ item }: { item: Message }) => {
-      return (
-        <MessageRow
-          msg={item}
-          onCitationClick={handleCitationClick}
-        />
-      );
+      return <MessageRow msg={item} onCitationClick={handleCitationClick} />;
     },
     [handleCitationClick],
   );
@@ -243,14 +237,12 @@ export function NotebookChat() {
             data={messages}
             keyExtractor={keyExtractor}
             renderItem={renderItem}
-            contentContainerStyle={{ paddingTop: 24 }}
+            contentContainerStyle={{ paddingTop: 24, paddingBottom: 24 }}
             showsVerticalScrollIndicator={true}
             style={styles.chatScroll}
             inverted={true}
             ListHeaderComponent={
-              isTyping ? (
-                <TypingRow streamingText={streamingText} />
-              ) : null
+              isTyping ? <TypingRow streamingText={streamingText} /> : null
             }
             initialNumToRender={30}
             windowSize={11}
@@ -396,12 +388,7 @@ export function NotebookChat() {
               pressed && styles.menuItemPressed,
             ]}
           >
-            <View
-              style={[
-                styles.menuIconContainer,
-                styles.menuIconSources,
-              ]}
-            >
+            <View style={[styles.menuIconContainer, styles.menuIconSources]}>
               <Ionicons
                 name="document-text-outline"
                 size={20}
@@ -428,12 +415,7 @@ export function NotebookChat() {
               pressed && styles.menuItemPressed,
             ]}
           >
-            <View
-              style={[
-                styles.menuIconContainer,
-                styles.menuIconStudio,
-              ]}
-            >
+            <View style={[styles.menuIconContainer, styles.menuIconStudio]}>
               <Ionicons
                 name="musical-notes-outline"
                 size={20}
@@ -462,9 +444,7 @@ export function NotebookChat() {
               pressed && styles.menuItemPressed,
             ]}
           >
-            <View
-              style={[styles.menuIconContainer, styles.menuIconInvite]}
-            >
+            <View style={[styles.menuIconContainer, styles.menuIconInvite]}>
               <Ionicons name="person-add-outline" size={20} color="#6b7280" />
             </View>
             <View style={styles.menuTextContainer}>

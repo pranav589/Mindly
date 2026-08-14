@@ -5,6 +5,8 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { loadStoredTokens } from "@/services/api";
 import { AuthProvider } from "@/context/AuthContext";
+import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
+import { MiniPlayer } from "@/components/MiniPlayer/MiniPlayer";
 
 const queryClient = new QueryClient();
 
@@ -28,14 +30,17 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="onboarding" />
-            <Stack.Screen name="auth" />
-            <Stack.Screen name="(tabs)" />
-          </Stack>
-        </GestureHandlerRootView>
+        <AudioPlayerProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="onboarding" />
+              <Stack.Screen name="auth" />
+              <Stack.Screen name="(tabs)" />
+            </Stack>
+            <MiniPlayer />
+          </GestureHandlerRootView>
+        </AudioPlayerProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
