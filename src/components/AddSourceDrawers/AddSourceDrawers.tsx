@@ -1,11 +1,11 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as DocumentPicker from "expo-document-picker";
-import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { Alert, Pressable, Text, TextInput, View } from "react-native";
 import BottomSheet from "@/components/BottomSheet";
+import { useImageSource } from "@/hooks/useImageSource";
 import { apiClient } from "@/services/api";
 import { styles } from "./AddSourceDrawers.styles";
 
@@ -25,6 +25,11 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [textTitle, setTextTitle] = useState("");
   const [textContent, setTextContent] = useState("");
+
+  const { uploadImageSource, isUploading } = useImageSource(
+    id as string,
+    onClose
+  );
 
   const createSourceMutation = useMutation({
     mutationFn: async (payload: {
@@ -100,61 +105,7 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
     }
   };
 
-  const handlePickImage = async (mode: "camera" | "image") => {
-    try {
-      let permissionResult;
-      if (mode === "camera") {
-        permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-      } else {
-        permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      }
 
-      if (!permissionResult.granted) {
-        Alert.alert(
-          "Permission Required",
-          `We need permission to access your ${
-            mode === "camera" ? "camera" : "photos"
-          } to upload scans.`
-        );
-        return;
-      }
-
-      let result;
-      if (mode === "camera") {
-        result = await ImagePicker.launchCameraAsync({
-          allowsEditing: true,
-          quality: 0.8,
-        });
-      } else {
-        result = await ImagePicker.launchImageLibraryAsync({
-          allowsEditing: true,
-          quality: 0.8,
-        });
-      }
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const asset = result.assets[0];
-        const filename = asset.fileName || `scan-${Date.now()}.jpg`;
-        const mimeType = asset.mimeType || "image/jpeg";
-
-        const filePayload = {
-          uri: asset.uri,
-          name: filename,
-          type: mimeType,
-        };
-
-        onClose();
-
-        createSourceMutation.mutate({
-          type: "image",
-          file: filePayload,
-        });
-      }
-    } catch (error) {
-      console.error("Error picking image:", error);
-      Alert.alert("Error", "Failed to capture or select image.");
-    }
-  };
 
   const submitWebUrl = () => {
     if (!webUrl.trim()) {
@@ -280,7 +231,7 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
 
           {/* Camera scan button */}
           <Pressable
-            onPress={() => handlePickImage("camera")}
+            onPress={() => uploadImageSource("camera")}
             style={({ pressed }) => [
               styles.sourceButton,
               { opacity: pressed ? 0.7 : 1 },
@@ -294,7 +245,7 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
 
           {/* Gallery image button */}
           <Pressable
-            onPress={() => handlePickImage("image")}
+            onPress={() => uploadImageSource("image")}
             style={({ pressed }) => [
               styles.sourceButton,
               { opacity: pressed ? 0.7 : 1 },
