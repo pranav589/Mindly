@@ -3,7 +3,7 @@ import { API_BASE_URL } from "./api";
 
 /**
  * Generates the deep-link redirect URI for the current Expo environment.
- * Uses the app's registered scheme ("lumabook://") so the OS can hand
+ * Uses the app's registered scheme ("mindly://") so the OS can hand
  * control back to the app after the browser OAuth flow completes.
  */
 export const getGoogleRedirectUri = (): string => {

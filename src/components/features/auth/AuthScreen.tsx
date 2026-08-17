@@ -61,7 +61,7 @@ export default function AuthScreen() {
             <View style={styles.logoCircle}>
               <Ionicons name="sparkles" size={28} color="#ffffff" />
             </View>
-            <Text style={styles.appName}>LumaBook</Text>
+            <Text style={styles.appName}>Mindly</Text>
             <Text style={styles.appTagline}>Your Cognitive Workspace</Text>
           </View>
 

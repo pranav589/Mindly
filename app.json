@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "lumabook",
-    "slug": "lumabook",
+    "name": "Mindly",
+    "slug": "mindly",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "lumabook",
+    "scheme": "mindly",
     "ios": {
       "supportsTablet": true
     },
@@ -24,7 +24,7 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
-      "package": "com.anonymous.lumabook"
+      "package": "com.anonymous.mindly"
     },
     "web": {
       "output": "static",
