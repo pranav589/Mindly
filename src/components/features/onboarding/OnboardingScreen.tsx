@@ -1,10 +1,11 @@
 import { theme } from "@/theme/themes";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
+  Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
@@ -13,7 +14,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Button from "@/components/Button";
+import { useAuth } from "@/hooks/useAuth";
 import { getStyles } from "./OnboardingScreen.styles";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -22,33 +23,44 @@ export default function OnboardingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const styles = getStyles(insets);
+  const { user, loginWithGoogle } = useAuth();
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
 
+  useEffect(() => {
+    if (user) {
+      router.replace("/(tabs)" as any);
+    }
+  }, [user]);
+
   const slides = [
     {
-      title: "Ingest Knowledge",
+      title: "Welcome to Mindly",
       description:
-        "Upload documents, notes, and fragments. Our system structures the chaos into a clean, searchable base.",
-      icon: "cloud-upload-outline",
-      bgStyle: { backgroundColor: "rgba(162, 217, 206, 0.2)" },
-      iconColor: theme.colors.primary,
+        "Your dedicated 'second brain' for capturing, organizing, and synthesizing information.",
+      image: require("../../../../assets/images/onboarding/welcome.jpg"),
+      buttonText: "Get Started",
     },
     {
-      title: "Analyze Connections",
+      title: "Gather Everything\nIn One Place",
       description:
-        "Discover hidden patterns. We automatically synthesize relationships to surface insights you might miss.",
-      icon: "git-network-outline",
-      bgStyle: { backgroundColor: "rgba(17, 120, 100, 0.1)" },
-      iconColor: theme.colors.primaryDark,
+        "Easily import notes, articles, research papers, PDFs, images, and audio. Mindly accepts diverse formats.",
+      image: require("../../../../assets/images/onboarding/gather.jpg"),
+      buttonText: "Next",
     },
     {
-      title: "Study with Focus",
+      title: "Unlock AI-\nInsights & Synthesis",
       description:
-        "Enter a distraction-free zone. Review tailored summaries and test your comprehension in an optimized space.",
-      icon: "school-outline",
-      bgStyle: { backgroundColor: "rgba(218, 247, 166, 0.2)" },
-      iconColor: theme.colors.onboardingTertiary,
+        "Let Mindly analyze your content to generate summaries, identify key concepts, link related ideas, and answer questions",
+      image: require("../../../../assets/images/onboarding/ai.jpg"),
+      buttonText: "Next",
+    },
+    {
+      title: "Discover &\nConnect Ideas",
+      description:
+        "Navigate your personalized knowledge graph. Find obscure links and watch your understanding grow.",
+      image: require("../../../../assets/images/onboarding/graph.jpg"),
+      buttonText: "Continue with Google",
     },
   ];
 
@@ -58,15 +70,22 @@ export default function OnboardingScreen() {
     setActiveIndex(index);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (activeIndex < slides.length - 1) {
       scrollViewRef.current?.scrollTo({
         x: (activeIndex + 1) * SCREEN_WIDTH,
         animated: true,
       });
     } else {
-      router.replace("/auth");
+      await loginWithGoogle();
     }
+  };
+
+  const handleSkip = () => {
+    scrollViewRef.current?.scrollTo({
+      x: (slides.length - 1) * SCREEN_WIDTH,
+      animated: true,
+    });
   };
 
   const slideWidthStyle = { width: SCREEN_WIDTH };
@@ -77,12 +96,14 @@ export default function OnboardingScreen() {
 
       {/* Skip Button (Top Right) */}
       <View style={styles.skipRow}>
-        <Pressable
-          onPress={() => router.replace("/auth")}
-          style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-        >
-          <Text style={styles.skipText}>Skip</Text>
-        </Pressable>
+        {activeIndex < slides.length - 1 ? (
+          <Pressable
+            onPress={handleSkip}
+            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+          >
+            <Text style={styles.skipText}>Skip</Text>
+          </Pressable>
+        ) : null}
       </View>
 
       {/* Horizontal Carousel */}
@@ -97,21 +118,25 @@ export default function OnboardingScreen() {
       >
         {slides.map((slide, index) => (
           <View key={index} style={[styles.slide, slideWidthStyle]}>
-            {/* Minimalist illustration card */}
-            <View style={[styles.illustrationCard, slide.bgStyle]}>
-              <View style={styles.iconCircle}>
-                <Ionicons
-                  name={slide.icon as any}
-                  size={48}
-                  color={slide.iconColor}
-                />
-              </View>
+            {/* Header Logo */}
+            <View style={styles.logoContainer}>
+              <FontAwesome6
+                name="brain"
+                size={22}
+                color={theme.colors.primary}
+              />
+              <Text style={styles.logoText}>Mindly</Text>
             </View>
 
             {/* Slide Texts */}
             <View style={styles.textContainer}>
               <Text style={styles.slideTitle}>{slide.title}</Text>
               <Text style={styles.slideDescription}>{slide.description}</Text>
+            </View>
+
+            {/* Illustration */}
+            <View style={styles.illustrationContainer}>
+              <Image source={slide.image} style={styles.illustrationImage} />
             </View>
           </View>
         ))}
@@ -133,12 +158,31 @@ export default function OnboardingScreen() {
         </View>
 
         {/* Action Button */}
-        <Button onPress={handleNext}>
+        <Pressable
+          onPress={handleNext}
+          style={({ pressed }) => [
+            styles.button,
+            { opacity: pressed ? 0.85 : 1 },
+          ]}
+        >
+          {activeIndex === slides.length - 1 && (
+            <Ionicons
+              name="logo-google"
+              size={18}
+              color={theme.colors.textLight}
+            />
+          )}
           <Text style={styles.buttonLabel}>
-            {activeIndex === slides.length - 1 ? "Get Started" : "Next"}
+            {slides[activeIndex].buttonText}
           </Text>
-          <Ionicons name="arrow-forward" size={16} color={theme.colors.textLight} />
-        </Button>
+          {activeIndex < slides.length - 1 && (
+            <Ionicons
+              name="arrow-forward"
+              size={16}
+              color={theme.colors.textLight}
+            />
+          )}
+        </Pressable>
       </View>
     </View>
   );
