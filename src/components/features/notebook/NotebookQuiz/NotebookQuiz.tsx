@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { useNotifications } from "@/context/NotificationContext";
 import { apiClient } from "@/services/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -225,7 +226,7 @@ export function NotebookQuiz() {
   if (isFetchingQuiz || generateQuizMutation.isPending) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#117864" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>
           {generateQuizMutation.isPending
             ? "Generating Quiz…"
@@ -269,7 +270,7 @@ export function NotebookQuiz() {
   if (!currentQuestion) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#117864" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }

@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
   },
   keyboardAvoiding: {
     flex: 1,
@@ -16,11 +17,11 @@ export const styles = StyleSheet.create({
   },
   progressTrack: {
     height: 4,
-    backgroundColor: "#e0e6e6",
+    backgroundColor: theme.colors.border,
   },
   progressFill: {
     height: 4,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     borderRadius: 2,
   },
   content: {
@@ -36,12 +37,12 @@ export const styles = StyleSheet.create({
   counter: {
     fontSize: 13,
     fontWeight: "bold",
-    color: "#117864",
+    color: theme.colors.primary,
     textTransform: "uppercase",
     letterSpacing: 1,
   },
   typeBadge: {
-    backgroundColor: "#e8f5f3",
+    backgroundColor: theme.colors.primarySubtle,
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -49,12 +50,12 @@ export const styles = StyleSheet.create({
   typeBadgeText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#117864",
+    color: theme.colors.primary,
   },
   questionText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginBottom: 24,
     lineHeight: 26,
   },
@@ -70,43 +71,43 @@ export const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#e0e6e6",
-    backgroundColor: "#ffffff",
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
   optionText: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#374151",
+    color: theme.colors.text,
     flex: 1,
   },
   icon: {
     marginLeft: 8,
   },
   correctCard: {
-    backgroundColor: "#e8f5e9",
-    borderColor: "#2e7d32",
+    backgroundColor: theme.colors.successLight,
+    borderColor: theme.colors.accentGreen,
   },
   correctText: {
-    color: "#2e7d32",
+    color: theme.colors.accentGreen,
   },
   incorrectCard: {
-    backgroundColor: "#ffebee",
-    borderColor: "#c62828",
+    backgroundColor: theme.colors.errorLight,
+    borderColor: theme.colors.accentRed,
   },
   incorrectText: {
-    color: "#c62828",
+    color: theme.colors.accentRed,
   },
   shortAnswerContainer: {
     marginBottom: 24,
   },
   shortAnswerInput: {
     borderWidth: 1.5,
-    borderColor: "#e0e6e6",
+    borderColor: theme.colors.border,
     borderRadius: 16,
     padding: 16,
     fontSize: 15,
-    color: "#111827",
-    backgroundColor: "#fff",
+    color: theme.colors.textHeading,
+    backgroundColor: theme.colors.surface,
     minHeight: 100,
     textAlignVertical: "top",
   },
@@ -115,7 +116,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     borderRadius: 24,
     paddingVertical: 14,
     paddingHorizontal: 24,
@@ -123,7 +124,7 @@ export const styles = StyleSheet.create({
     marginTop: 12,
   },
   primaryButtonText: {
-    color: "#ffffff",
+    color: theme.colors.textLight,
     fontSize: 15,
     fontWeight: "bold",
   },
@@ -135,18 +136,18 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     marginBottom: 24,
-    borderColor: "#e0e6e6",
-    backgroundColor: "#fff",
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
   explanationLabel: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#374151",
+    color: theme.colors.text,
     marginBottom: 6,
   },
   explanationText: {
     fontSize: 14,
-    color: "#4b5563",
+    color: theme.colors.gray500,
     lineHeight: 20,
   },
 });

@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -128,7 +129,7 @@ export function NotebookMindmap() {
   if (isLoadingNotebook) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#117864" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>Loading notebook details…</Text>
       </View>
     );
@@ -137,7 +138,7 @@ export function NotebookMindmap() {
   if (isGenerating) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#117864" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.generatingTitle}>Structuring Concept Map</Text>
         <Text style={styles.generatingSubtitle}>
           {progressText ||
@@ -157,14 +158,14 @@ export function NotebookMindmap() {
         <StatusBar style="dark" />
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} style={styles.headerButton}>
-            <Ionicons name="arrow-back" size={24} color="#117864" />
+            <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
           </Pressable>
           <Text style={styles.headerTitle}>Concept Mind Map</Text>
           <View style={styles.headerPlaceholder} />
         </View>
 
         <View style={styles.centered}>
-          <Ionicons name="git-network-outline" size={72} color="#c8d8d5" />
+          <Ionicons name="git-network-outline" size={72} color={theme.colors.lightGrayIcon} />
           <Text style={styles.emptyTitle}>No Mind Map Yet</Text>
           <Text style={styles.emptySubtitle}>
             Build an interactive, zoomable network of concepts mapped
@@ -181,7 +182,7 @@ export function NotebookMindmap() {
             }}
             style={styles.primaryButton}
           >
-            <Ionicons name="sparkles-outline" size={18} color="#fff" />
+            <Ionicons name="sparkles-outline" size={18} color={theme.colors.textLight} />
             <Text style={styles.primaryButtonText}>Generate Mind Map</Text>
           </Pressable>
         </View>
@@ -198,7 +199,7 @@ export function NotebookMindmap() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.headerButton}>
-          <Ionicons name="arrow-back" size={24} color="#117864" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
         </Pressable>
         <Text style={styles.headerTitle}>Concept Mind Map</Text>
         <Pressable
@@ -224,7 +225,7 @@ export function NotebookMindmap() {
           }}
           style={styles.headerButton}
         >
-          <Ionicons name="refresh-outline" size={22} color="#117864" />
+          <Ionicons name="refresh-outline" size={22} color={theme.colors.primary} />
         </Pressable>
       </View>
 
@@ -279,7 +280,7 @@ export function NotebookMindmap() {
                 <Ionicons
                   name="document-text-outline"
                   size={12}
-                  color="#117864"
+                  color={theme.colors.primary}
                 />
                 <Text style={styles.sourceTagText} numberOfLines={1}>
                   {selectedNode.sourceName}
@@ -373,7 +374,7 @@ function getMindMapHtml(data: MindMapData): string {
       <style>
         body, html {
           margin: 0; padding: 0; width: 100%; height: 100%;
-          overflow: hidden; background-color: #f8fafa;
+          overflow: hidden; background-color: ${theme.colors.background};
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         svg {
@@ -385,7 +386,7 @@ function getMindMapHtml(data: MindMapData): string {
         }
         .node circle {
           stroke-width: 2.5px;
-          stroke: #ffffff;
+          stroke: ${theme.colors.textLight};
           cursor: pointer;
           transition: r 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
@@ -395,28 +396,28 @@ function getMindMapHtml(data: MindMapData): string {
         .node text {
           font-size: 13px;
           font-weight: 700;
-          fill: #1f2937;
+          fill: ${theme.colors.text};
           text-anchor: middle;
           pointer-events: none;
           paint-order: stroke;
-          stroke: #ffffff;
+          stroke: ${theme.colors.textLight};
           stroke-width: 4px;
           stroke-linejoin: round;
         }
         .link {
           fill: none;
-          stroke: #a2d9ce;
+          stroke: ${theme.colors.primaryLight};
           stroke-opacity: 0.65;
           stroke-width: 2px;
           stroke-dasharray: 4 2;
         }
         .link-label {
           font-size: 9px;
-          fill: #7f8c8d;
+          fill: ${theme.colors.gray500};
           text-anchor: middle;
           pointer-events: none;
           paint-order: stroke;
-          stroke: #ffffff;
+          stroke: ${theme.colors.textLight};
           stroke-width: 2.5px;
         }
       </style>
@@ -481,14 +482,14 @@ function getMindMapHtml(data: MindMapData): string {
           });
  
         const colors = {
-          intro: "#117864",
-          intermediate: "#f39c12",
-          advanced: "#e74c3c"
+          intro: "${theme.colors.primary}",
+          intermediate: "${theme.colors.accentOrange}",
+          advanced: "${theme.colors.accentRed}"
         };
  
         node.append("circle")
           .attr("r", 25)
-          .attr("fill", d => colors[d.difficulty] || "#117864")
+          .attr("fill", d => colors[d.difficulty] || "${theme.colors.primary}")
           .style("filter", "drop-shadow(0px 4px 6px rgba(0,0,0,0.15))");
  
         node.append("text")

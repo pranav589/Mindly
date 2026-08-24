@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -102,7 +103,7 @@ export function NotebookPodcast() {
   if (isLoadingNotebook) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#117864" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>Loading notebook details…</Text>
       </View>
     );
@@ -111,7 +112,7 @@ export function NotebookPodcast() {
   if (isGenerating) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#117864" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.generatingTitle}>Structuring Audio Discussion</Text>
         <Text style={styles.generatingSubtitle}>
           {progressText ||
@@ -128,7 +129,7 @@ export function NotebookPodcast() {
         <ScreenHeader title="Audio Overview" />
 
         <View style={styles.centered}>
-          <Ionicons name="mic-outline" size={72} color="#c8d8d5" />
+          <Ionicons name="mic-outline" size={72} color={theme.colors.lightGrayIcon} />
           <Text style={styles.emptyTitle}>No Audio Overview Yet</Text>
           <Text style={styles.emptySubtitle}>
             Generate an AI conversational podcast dialog summarizing the
@@ -145,7 +146,7 @@ export function NotebookPodcast() {
             }}
             style={styles.primaryButton}
           >
-            <Ionicons name="sparkles-outline" size={18} color="#fff" />
+            <Ionicons name="sparkles-outline" size={18} color={theme.colors.textLight} />
             <Text style={styles.primaryButtonText}>
               Generate Audio Overview
             </Text>

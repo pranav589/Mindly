@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
   },
   content: {
     padding: 24,
@@ -12,14 +13,14 @@ export const styles = StyleSheet.create({
   },
   scoreCard: {
     width: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.surface,
     borderRadius: 20,
     padding: 24,
     alignItems: "center",
     gap: 6,
     borderWidth: 1,
-    borderColor: "#e0e6e6",
-    shadowColor: "#117864",
+    borderColor: theme.colors.border,
+    shadowColor: theme.colors.primary,
     shadowOpacity: 0.07,
     shadowRadius: 12,
     elevation: 3,
@@ -32,22 +33,22 @@ export const styles = StyleSheet.create({
   gradeText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
   },
   scoreBig: {
     fontSize: 42,
     fontWeight: "900",
-    color: "#117864",
+    color: theme.colors.primary,
   },
   scorePercent: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
   },
   resultBarTrack: {
     width: "100%",
     height: 8,
-    backgroundColor: "#e0e6e6",
+    backgroundColor: theme.colors.border,
     borderRadius: 4,
     marginTop: 8,
   },
@@ -58,23 +59,23 @@ export const styles = StyleSheet.create({
   historySectionTitle: {
     fontSize: 15,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
   },
   breakdownCard: {
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#e0e6e6",
-    backgroundColor: "#fff",
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
     marginBottom: 12,
   },
   correctCard: {
-    backgroundColor: "#e8f5e9",
-    borderColor: "#2e7d32",
+    backgroundColor: theme.colors.successLight,
+    borderColor: theme.colors.accentGreen,
   },
   incorrectCard: {
-    backgroundColor: "#ffebee",
-    borderColor: "#c62828",
+    backgroundColor: theme.colors.errorLight,
+    borderColor: theme.colors.accentRed,
   },
   breakdownHeader: {
     flexDirection: "row",
@@ -89,12 +90,12 @@ export const styles = StyleSheet.create({
   breakdownQuestion: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#1f2937",
+    color: theme.colors.text,
     marginBottom: 8,
   },
   breakdownYour: {
     fontSize: 13,
-    color: "#4b5563",
+    color: theme.colors.gray500,
     marginBottom: 4,
   },
   breakdownYourText: {
@@ -102,12 +103,12 @@ export const styles = StyleSheet.create({
   },
   breakdownCorrect: {
     fontSize: 13,
-    color: "#117864",
+    color: theme.colors.primary,
     marginBottom: 4,
   },
   breakdownExplanation: {
     fontSize: 13,
-    color: "#6b7280",
+    color: theme.colors.textSecondary,
     lineHeight: 18,
     marginTop: 8,
     borderTopWidth: 1,
@@ -119,7 +120,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     borderRadius: 24,
     paddingVertical: 14,
     paddingHorizontal: 24,
@@ -127,7 +128,7 @@ export const styles = StyleSheet.create({
     marginTop: 8,
   },
   primaryButtonText: {
-    color: "#ffffff",
+    color: theme.colors.textLight,
     fontSize: 15,
     fontWeight: "bold",
   },
@@ -137,7 +138,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
     borderWidth: 1.5,
-    borderColor: "#117864",
+    borderColor: theme.colors.primary,
     borderRadius: 24,
     paddingVertical: 14,
     paddingHorizontal: 24,
@@ -146,7 +147,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   outlineButtonText: {
-    color: "#117864",
+    color: theme.colors.primary,
     fontSize: 15,
     fontWeight: "bold",
   },

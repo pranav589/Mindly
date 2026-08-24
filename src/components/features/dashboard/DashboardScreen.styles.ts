@@ -1,10 +1,11 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const getStyles = (insets: { top: number; bottom: number }) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#f8fafa",
+      backgroundColor: theme.colors.background,
       paddingTop: insets.top,
     },
     header: {
@@ -13,7 +14,7 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       justifyContent: "space-between",
       paddingHorizontal: 20,
       paddingVertical: 12,
-      backgroundColor: "#f8fafa",
+      backgroundColor: theme.colors.background,
     },
     profileContainer: {
       flexDirection: "row",
@@ -25,12 +26,12 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       height: 40,
       borderRadius: 20,
       borderWidth: 1,
-      borderColor: "#e0e6e6",
+      borderColor: theme.colors.border,
     },
     workspaceText: {
       fontSize: 20,
       fontWeight: "600",
-      color: "#117864",
+      color: theme.colors.primary,
     },
     workspaceSelector: {
       flexDirection: "row",
@@ -40,7 +41,7 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     },
     workspaceType: {
       fontSize: 12,
-      color: "#6e7a75",
+      color: theme.colors.textSecondary,
     },
     headerSearchButton: {
       width: 40,
@@ -60,13 +61,13 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       marginVertical: 16,
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: "#ffffff",
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: "#e0e6e6",
+      borderColor: theme.colors.border,
       borderRadius: 24,
       paddingHorizontal: 12,
       paddingVertical: 10,
-      shadowColor: "#000",
+      shadowColor: theme.colors.black,
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.05,
       shadowRadius: 2,
@@ -78,7 +79,7 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     searchInput: {
       flex: 1,
       fontSize: 14,
-      color: "#1f2937",
+      color: theme.colors.text,
     },
     micButton: {
       padding: 4,
@@ -92,7 +93,7 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     sectionTitle: {
       fontSize: 18,
       fontWeight: "bold",
-      color: "#111827",
+      color: theme.colors.textHeading,
     },
     filterButton: {
       padding: 4,
@@ -105,13 +106,13 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     },
     notebookCard: {
       width: "48%",
-      backgroundColor: "#ffffff",
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: "#e0e6e6",
+      borderColor: theme.colors.border,
       borderRadius: 24,
       padding: 16,
       marginBottom: 16,
-      shadowColor: "#000",
+      shadowColor: theme.colors.black,
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.05,
       shadowRadius: 2,
@@ -131,7 +132,7 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     notebookTitle: {
       fontSize: 14,
       fontWeight: "600",
-      color: "#030712",
+      color: theme.colors.textDark,
       lineHeight: 20,
       marginBottom: 8,
       height: 40,
@@ -143,15 +144,15 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     },
     notebookMetaText: {
       fontSize: 12,
-      color: "#6e7a75",
+      color: theme.colors.textSecondary,
       marginLeft: 4,
     },
     addNotebookCard: {
       width: "48%",
-      backgroundColor: "#f8fafa",
+      backgroundColor: theme.colors.background,
       borderWidth: 1,
       borderStyle: "dashed",
-      borderColor: "#e0e6e6",
+      borderColor: theme.colors.border,
       borderRadius: 24,
       padding: 16,
       marginBottom: 16,
@@ -167,7 +168,7 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       width: 48,
       height: 48,
       borderRadius: 24,
-      backgroundColor: "#f3f4f6",
+      backgroundColor: theme.colors.gray100,
       alignItems: "center",
       justifyContent: "center",
       marginBottom: 8,
@@ -175,7 +176,7 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     addNotebookText: {
       fontSize: 12,
       fontWeight: "600",
-      color: "#9ca3af",
+      color: theme.colors.textMuted,
     },
     drawerItem: {
       flexDirection: "row",
@@ -185,23 +186,23 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       borderRadius: 24,
     },
     drawerItemPressed: {
-      backgroundColor: "#f9fafb",
+      backgroundColor: theme.colors.gray50,
     },
     drawerItemIconContainer: {
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: "#f3f4f6",
+      backgroundColor: theme.colors.gray100,
       alignItems: "center",
       justifyContent: "center",
     },
     drawerItemIconContainerPrimary: {
-      backgroundColor: "rgba(162, 217, 206, 0.35)",
+      backgroundColor: theme.colors.primarySubtle,
     },
     drawerItemText: {
       fontSize: 14,
       fontWeight: "600",
-      color: "#1f2937",
+      color: theme.colors.text,
     },
     modalOverlay: {
       flex: 1,
@@ -213,10 +214,10 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     modalContent: {
       width: "100%",
       maxWidth: 340,
-      backgroundColor: "#ffffff",
+      backgroundColor: theme.colors.surface,
       borderRadius: 20,
       padding: 24,
-      shadowColor: "#000",
+      shadowColor: theme.colors.black,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.1,
       shadowRadius: 12,
@@ -225,23 +226,23 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     modalTitle: {
       fontSize: 18,
       fontWeight: "bold",
-      color: "#111827",
+      color: theme.colors.textHeading,
       marginBottom: 8,
     },
     modalSubtitle: {
       fontSize: 14,
-      color: "#4b5563",
+      color: theme.colors.gray500,
       marginBottom: 16,
     },
     modalInput: {
       width: "100%",
       height: 48,
       borderWidth: 1,
-      borderColor: "#e5e7eb",
+      borderColor: theme.colors.borderMuted,
       borderRadius: 12,
       paddingHorizontal: 16,
       fontSize: 15,
-      color: "#111827",
+      color: theme.colors.textHeading,
       marginBottom: 20,
     },
     modalButtons: {
@@ -257,9 +258,9 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       justifyContent: "center",
     },
     modalCancelButton: {
-      backgroundColor: "#f3f4f6",
+      backgroundColor: theme.colors.gray100,
       borderWidth: 1,
-      borderColor: "#e5e7eb",
+      borderColor: theme.colors.borderMuted,
     },
     modalCancelButtonPressed: {
       opacity: 0.8,
@@ -267,10 +268,10 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     modalCancelButtonText: {
       fontSize: 14,
       fontWeight: "600",
-      color: "#4b5563",
+      color: theme.colors.gray500,
     },
     modalCreateButton: {
-      backgroundColor: "#117864",
+      backgroundColor: theme.colors.primary,
     },
     modalCreateButtonPressed: {
       opacity: 0.8,
@@ -278,6 +279,6 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     modalCreateButtonText: {
       fontSize: 14,
       fontWeight: "600",
-      color: "#ffffff",
+      color: theme.colors.textLight,
     },
   });

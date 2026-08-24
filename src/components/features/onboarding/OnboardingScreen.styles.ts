@@ -1,10 +1,11 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const getStyles = (insets: { top: number; bottom: number }) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#ffffff",
+      backgroundColor: theme.colors.surface,
       paddingTop: insets.top,
       paddingBottom: insets.bottom,
     },
@@ -17,7 +18,7 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     skipText: {
       fontSize: 14,
       fontWeight: "600",
-      color: "#9ca3af",
+      color: theme.colors.textMuted,
     },
     carousel: {
       flex: 1,
@@ -36,7 +37,7 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       justifyContent: "center",
       padding: 32,
       marginBottom: 48,
-      shadowColor: "#117864",
+      shadowColor: theme.colors.primary,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.05,
       shadowRadius: 10,
@@ -46,10 +47,10 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       width: 96,
       height: 96,
       borderRadius: 9999,
-      backgroundColor: "#ffffff",
+      backgroundColor: theme.colors.surface,
       alignItems: "center",
       justifyContent: "center",
-      shadowColor: "#000",
+      shadowColor: theme.colors.black,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.05,
       shadowRadius: 5,
@@ -62,13 +63,13 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     slideTitle: {
       fontSize: 24,
       fontWeight: "bold",
-      color: "#117864",
+      color: theme.colors.primary,
       textAlign: "center",
       marginBottom: 16,
     },
     slideDescription: {
       fontSize: 14,
-      color: "#6b7280",
+      color: theme.colors.gray500,
       textAlign: "center",
       lineHeight: 24,
       maxWidth: 280,
@@ -91,14 +92,14 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     },
     dotActive: {
       width: 24,
-      backgroundColor: "#117864",
+      backgroundColor: theme.colors.primary,
     },
     dotInactive: {
       width: 6,
-      backgroundColor: "#e5e7eb",
+      backgroundColor: theme.colors.borderMuted,
     },
     buttonLabel: {
-      color: "#ffffff",
+      color: theme.colors.textLight,
       fontWeight: "600",
       fontSize: 14,
     },

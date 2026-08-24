@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { useRouter } from "expo-router";
 import React, { createContext, useContext, useEffect } from "react";
 import { Platform } from "react-native";
@@ -65,7 +66,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
           name: "default",
           importance: Notifications.AndroidImportance.MAX,
           vibrationPattern: [0, 250, 250, 250],
-          lightColor: "#117864",
+          lightColor: theme.colors.primary,
         });
       }
     }

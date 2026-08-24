@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { styles } from "./ScreenHeader.styles";
+import { theme } from "@/theme/themes";
 
 interface ScreenHeaderProps {
   title: string;
@@ -26,7 +27,7 @@ export default function ScreenHeader({
   return (
     <View style={styles.header}>
       <Pressable onPress={handleBack} style={styles.headerButton}>
-        <Ionicons name="arrow-back" size={24} color="#117864" />
+        <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
       </Pressable>
 
       <Text style={styles.headerTitle} numberOfLines={1}>
@@ -39,10 +40,10 @@ export default function ScreenHeader({
             <MaterialIcons
               name={rightIcon as any}
               size={22}
-              color="#117864"
+              color={theme.colors.primary}
             />
           ) : (
-            <Ionicons name={rightIcon as any} size={22} color="#117864" />
+            <Ionicons name={rightIcon as any} size={22} color={theme.colors.primary} />
           )}
         </Pressable>
       ) : (

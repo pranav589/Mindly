@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import ScreenHeader from "@/components/ScreenHeader/ScreenHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
@@ -51,11 +52,11 @@ export function QuizResultsView({
 
   const pctFillStyle = {
     width: `${pct}%` as any,
-    backgroundColor: pct >= 70 ? "#117864" : pct >= 40 ? "#f57c00" : "#c62828",
+    backgroundColor: pct >= 70 ? theme.colors.primary : pct >= 40 ? theme.colors.accentOrange : theme.colors.textError,
   };
 
-  const textCorrectStyle = { color: "#2e7d32" };
-  const textIncorrectStyle = { color: "#c62828" };
+  const textCorrectStyle = { color: theme.colors.accentGreen };
+  const textIncorrectStyle = { color: theme.colors.textError };
 
   const containerInsetPadding = { paddingTop: insets.top };
 
@@ -94,7 +95,7 @@ export function QuizResultsView({
                 <Ionicons
                   name={correct ? "checkmark-circle" : "close-circle"}
                   size={20}
-                  color={correct ? "#2e7d32" : "#c62828"}
+                  color={correct ? theme.colors.accentGreen : theme.colors.textError}
                 />
                 <Text
                   style={[
@@ -133,11 +134,11 @@ export function QuizResultsView({
         })}
 
         <Pressable onPress={onRetake} style={styles.primaryButton}>
-          <Ionicons name="refresh" size={18} color="#fff" />
+          <Ionicons name="refresh" size={18} color={theme.colors.textLight} />
           <Text style={styles.primaryButtonText}>Retake Quiz</Text>
         </Pressable>
         <Pressable onPress={onGoHome} style={styles.outlineButton}>
-          <Ionicons name="home-outline" size={18} color="#117864" />
+          <Ionicons name="home-outline" size={18} color={theme.colors.primary} />
           <Text style={styles.outlineButtonText}>Back to Home</Text>
         </Pressable>
       </ScrollView>

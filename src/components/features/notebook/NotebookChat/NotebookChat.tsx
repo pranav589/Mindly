@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import BottomSheet from "@/components/BottomSheet";
 import { useSSE } from "@/context/SSEContext";
 import { apiClient } from "@/services/api";
@@ -206,7 +207,7 @@ export function NotebookChat() {
             { opacity: pressed ? 0.7 : 1 },
           ]}
         >
-          <Ionicons name="arrow-back" size={24} color="#117864" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
         </Pressable>
         <View style={styles.headerTitleContainer}>
           <Text numberOfLines={1} style={styles.headerTitleText}>
@@ -227,8 +228,8 @@ export function NotebookChat() {
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           >
-            <ActivityIndicator size="large" color="#117864" />
-            <Text style={{ marginTop: 12, color: "#6e7a75", fontSize: 14 }}>
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+            <Text style={{ marginTop: 12, color: theme.colors.textSecondary, fontSize: 14 }}>
               Loading messages...
             </Text>
           </View>
@@ -266,7 +267,7 @@ export function NotebookChat() {
                 { opacity: pressed ? 0.7 : 1 },
               ]}
             >
-              <Ionicons name="add" size={22} color="#6e7a75" />
+              <Ionicons name="add" size={22} color={theme.colors.textSecondary} />
             </Pressable>
 
             <TextInput
@@ -274,7 +275,7 @@ export function NotebookChat() {
               onChangeText={setMessageText}
               placeholder="Ask about this document..."
               style={styles.textInput}
-              placeholderTextColor="#bdc9c4"
+              placeholderTextColor={theme.colors.placeholder}
               onSubmitEditing={handleSend}
               returnKeyType="send"
             />
@@ -287,7 +288,7 @@ export function NotebookChat() {
                   { opacity: pressed ? 0.7 : 1 },
                 ]}
               >
-                <Ionicons name="mic-outline" size={20} color="#6e7a75" />
+                <Ionicons name="mic-outline" size={20} color={theme.colors.textSecondary} />
               </Pressable>
             ) : (
               <Pressable
@@ -297,7 +298,7 @@ export function NotebookChat() {
                   pressed && styles.inputSendButtonPressed,
                 ]}
               >
-                <Ionicons name="arrow-up" size={18} color="#ffffff" />
+                <Ionicons name="arrow-up" size={18} color={theme.colors.textLight} />
               </Pressable>
             )}
           </View>
@@ -317,7 +318,7 @@ export function NotebookChat() {
               <Ionicons
                 name="document-text-outline"
                 size={16}
-                color="#117864"
+                color={theme.colors.primary}
               />
               <View>
                 <Text style={styles.citationMetaTitle}>
@@ -392,7 +393,7 @@ export function NotebookChat() {
               <Ionicons
                 name="document-text-outline"
                 size={20}
-                color="#117864"
+                color={theme.colors.primary}
               />
             </View>
             <View style={styles.menuTextContainer}>
@@ -401,7 +402,7 @@ export function NotebookChat() {
                 Manage PDFs, links, and documents
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={16} color="#9ca3af" />
+            <Ionicons name="chevron-forward" size={16} color={theme.colors.textMuted} />
           </Pressable>
 
           {/* Option: Audio Studio */}
@@ -419,7 +420,7 @@ export function NotebookChat() {
               <Ionicons
                 name="musical-notes-outline"
                 size={20}
-                color="#42591a"
+                color={theme.colors.onboardingTertiary}
               />
             </View>
             <View style={styles.menuTextContainer}>
@@ -428,7 +429,7 @@ export function NotebookChat() {
                 Listen to AI-generated podcasts & overviews
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={16} color="#9ca3af" />
+            <Ionicons name="chevron-forward" size={16} color={theme.colors.textMuted} />
           </Pressable>
 
           {/* Option: Invite Collaborators */}
@@ -445,7 +446,7 @@ export function NotebookChat() {
             ]}
           >
             <View style={[styles.menuIconContainer, styles.menuIconInvite]}>
-              <Ionicons name="person-add-outline" size={20} color="#6b7280" />
+              <Ionicons name="person-add-outline" size={20} color={theme.colors.mutedGrayIcon} />
             </View>
             <View style={styles.menuTextContainer}>
               <Text style={styles.menuItemTitle}>Invite Collaborators</Text>
@@ -453,7 +454,7 @@ export function NotebookChat() {
                 Share and work together on this notebook
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={16} color="#9ca3af" />
+            <Ionicons name="chevron-forward" size={16} color={theme.colors.textMuted} />
           </Pressable>
         </View>
       </BottomSheet>

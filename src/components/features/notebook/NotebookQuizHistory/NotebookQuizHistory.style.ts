@@ -1,14 +1,15 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f8fafa" },
+  container: { flex: 1, backgroundColor: theme.colors.background },
   centered: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 24,
   },
-  loadingText: { marginTop: 12, color: "#6e7a75", fontSize: 14 },
+  loadingText: { marginTop: 12, color: theme.colors.textSecondary, fontSize: 14 },
 
   header: {
     flexDirection: "row",
@@ -17,13 +18,13 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderColor: "#e0e6e6",
+    borderColor: theme.colors.border,
   },
   headerButton: { padding: 8 },
   headerTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#117864",
+    color: theme.colors.primary,
     flex: 1,
     textAlign: "center",
   },
@@ -34,21 +35,21 @@ export const styles = StyleSheet.create({
   statsRow: { flexDirection: "row", gap: 12 },
   statCard: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 16,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#e0e6e6",
-    shadowColor: "#117864",
+    borderColor: theme.colors.border,
+    shadowColor: theme.colors.primary,
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
   },
-  statValue: { fontSize: 24, fontWeight: "900", color: "#111827" },
+  statValue: { fontSize: 24, fontWeight: "900", color: theme.colors.textHeading },
   statLabel: {
     fontSize: 11,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     marginTop: 2,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -60,7 +61,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: "#e8f5f3",
+    backgroundColor: theme.colors.primarySubtle,
     borderRadius: 12,
     padding: 12,
   },
@@ -68,16 +69,16 @@ export const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     fontWeight: "700",
-    color: "#117864",
+    color: theme.colors.primary,
   },
-  quizAttemptCount: { fontSize: 11, color: "#6e7a75", fontWeight: "600" },
+  quizAttemptCount: { fontSize: 11, color: theme.colors.textSecondary, fontWeight: "600" },
 
   // Attempt card
   attemptCard: {
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#e0e6e6",
+    borderColor: theme.colors.border,
     overflow: "hidden",
   },
   attemptRow: {
@@ -94,9 +95,9 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   rankText: { fontSize: 12, fontWeight: "800" },
-  attemptDate: { fontSize: 12, color: "#6e7a75", marginBottom: 6 },
+  attemptDate: { fontSize: 12, color: theme.colors.textSecondary, marginBottom: 6 },
 
-  miniBarTrack: { height: 4, backgroundColor: "#e0e6e6", borderRadius: 2 },
+  miniBarTrack: { height: 4, backgroundColor: theme.colors.border, borderRadius: 2 },
   miniBarFill: { height: 4, borderRadius: 2 },
 
   attemptScoreBox: { alignItems: "flex-end" },
@@ -106,32 +107,32 @@ export const styles = StyleSheet.create({
   // Breakdown (expanded)
   breakdown: {
     borderTopWidth: 1,
-    borderTopColor: "#e0e6e6",
+    borderTopColor: theme.colors.border,
     paddingHorizontal: 14,
     paddingVertical: 12,
     gap: 14,
-    backgroundColor: "#fafcfc",
+    backgroundColor: theme.colors.gray50,
   },
   breakdownRow: { flexDirection: "row", gap: 10, alignItems: "flex-start" },
   breakdownQuestion: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginBottom: 2,
   },
-  breakdownAnswer: { fontSize: 12, color: "#6e7a75" },
-  breakdownCorrect: { fontSize: 12, color: "#c62828", marginTop: 2 },
+  breakdownAnswer: { fontSize: 12, color: theme.colors.textSecondary },
+  breakdownCorrect: { fontSize: 12, color: theme.colors.accentRed, marginTop: 2 },
 
   emptyTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginTop: 16,
     textAlign: "center",
   },
   emptySubtitle: {
     fontSize: 14,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     textAlign: "center",
     marginTop: 8,
   },

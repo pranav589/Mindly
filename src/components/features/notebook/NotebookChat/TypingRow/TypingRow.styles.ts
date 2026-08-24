@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   messageRow: {
@@ -19,30 +20,30 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     flexShrink: 0,
     marginTop: 2,
-    backgroundColor: "rgba(162, 217, 206, 0.35)",
+    backgroundColor: theme.colors.primarySubtle,
   },
   aiBubble: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: theme.colors.borderMuted,
     borderRadius: 16,
     borderTopLeftRadius: 0,
     padding: 12,
-    shadowColor: "#000",
+    shadowColor: theme.colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
   },
   aiText: {
-    color: "#111827",
+    color: theme.colors.textHeading,
     fontSize: 14,
     lineHeight: 20,
   },
   typingText: {
     fontSize: 12,
-    color: "#9ca3af",
+    color: theme.colors.textMuted,
   },
   typingIndicatorRow: {
     flexDirection: "row",

@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   header: {
@@ -7,9 +8,9 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
     borderBottomWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: theme.colors.borderMuted,
   },
   headerButton: {
     padding: 8,
@@ -18,7 +19,7 @@ export const styles = StyleSheet.create({
   headerTitle: {
     fontWeight: "bold",
     fontSize: 18,
-    color: "#111827",
+    color: theme.colors.textHeading,
     flex: 1,
     textAlign: "center",
   },

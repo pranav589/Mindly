@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
   },
   centered: {
     flex: 1,
@@ -13,7 +14,7 @@ export const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     fontSize: 14,
   },
   header: {
@@ -23,7 +24,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderColor: "#e0e6e6",
+    borderColor: theme.colors.border,
   },
   headerButton: {
     padding: 8,
@@ -31,7 +32,7 @@ export const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#117864",
+    color: theme.colors.primary,
     flex: 1,
     textAlign: "center",
   },
@@ -45,12 +46,12 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     marginBottom: 24,
     lineHeight: 20,
   },
@@ -69,17 +70,17 @@ export const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#e8f5f3",
+    backgroundColor: theme.colors.primarySubtle,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 2,
     borderWidth: 1,
-    borderColor: "#a2d9ce",
+    borderColor: theme.colors.primaryLight,
   },
   connectorLine: {
     width: 2,
     flex: 1,
-    backgroundColor: "#a2d9ce",
+    backgroundColor: theme.colors.primaryLight,
     position: "absolute",
     top: 36,
     bottom: -24,
@@ -87,12 +88,12 @@ export const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: "#e0e6e6",
+    borderColor: theme.colors.border,
     borderRadius: 16,
     padding: 16,
-    shadowColor: "#117864",
+    shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.04,
     shadowRadius: 8,
@@ -102,17 +103,17 @@ export const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#111827",
+    color: theme.colors.textHeading,
   },
   stepDesc: {
     fontSize: 13,
-    color: "#4b5563",
+    color: theme.colors.gray700,
     lineHeight: 18,
   },
   reasonBox: {
     flexDirection: "row",
     gap: 6,
-    backgroundColor: "#f2f4f4",
+    backgroundColor: theme.colors.gray50,
     borderRadius: 8,
     padding: 10,
     marginTop: 4,
@@ -120,14 +121,14 @@ export const styles = StyleSheet.create({
   reasonText: {
     flex: 1,
     fontSize: 12,
-    color: "#5d6d7e",
+    color: theme.colors.grayTextMedium,
     lineHeight: 16,
   },
   sourceTag: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: "#e8f5f3",
+    backgroundColor: theme.colors.primarySubtle,
     alignSelf: "flex-start",
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -139,17 +140,17 @@ export const styles = StyleSheet.create({
   sourceTagText: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#117864",
+    color: theme.colors.primary,
   },
   generatingTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginTop: 20,
   },
   generatingSubtitle: {
     fontSize: 13,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     textAlign: "center",
     marginTop: 8,
     lineHeight: 18,
@@ -157,12 +158,12 @@ export const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginTop: 16,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     textAlign: "center",
     marginTop: 8,
     marginBottom: 24,
@@ -173,13 +174,13 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     paddingVertical: 14,
     paddingHorizontal: 28,
     borderRadius: 16,
   },
   primaryButtonText: {
-    color: "#fff",
+    color: theme.colors.textLight,
     fontWeight: "bold",
     fontSize: 15,
   },
@@ -191,11 +192,11 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
     marginBottom: 16,
-    backgroundColor: "#f9fafb",
+    backgroundColor: theme.colors.gray50,
     padding: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: theme.colors.borderMuted,
   },
   metaTextContainer: {
     flex: 1,
@@ -203,11 +204,11 @@ export const styles = StyleSheet.create({
   metaTitle: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#1f2937",
+    color: theme.colors.text,
   },
   metaSubtitle: {
     fontSize: 11,
-    color: "#6b7280",
+    color: theme.colors.gray500,
     marginTop: 2,
   },
   detailSection: {
@@ -217,20 +218,20 @@ export const styles = StyleSheet.create({
   detailLabel: {
     fontSize: 12,
     fontWeight: "800",
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     textTransform: "uppercase",
     marginBottom: 4,
   },
   detailVal: {
     fontSize: 14,
-    color: "#374151",
+    color: theme.colors.gray700,
     lineHeight: 20,
   },
   detailConceptBold: {
     fontWeight: "700",
   },
   detailValLink: {
-    color: "#117864",
+    color: theme.colors.primary,
     textDecorationLine: "underline",
   },
   sheetDoneButton: {

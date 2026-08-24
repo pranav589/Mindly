@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -98,12 +99,12 @@ export function NotebookQuizHistory() {
   };
 
   const pctColor = (pct: number) =>
-    pct >= 70 ? "#2e7d32" : pct >= 40 ? "#f57c00" : "#c62828";
+    pct >= 70 ? theme.colors.accentGreen : pct >= 40 ? theme.colors.accentOrange : theme.colors.textError;
 
   if (isLoading) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#117864" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>Loading history…</Text>
       </View>
     );
@@ -115,13 +116,13 @@ export function NotebookQuizHistory() {
         <StatusBar style="dark" />
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} style={styles.headerButton}>
-            <Ionicons name="arrow-back" size={24} color="#117864" />
+            <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
           </Pressable>
           <Text style={styles.headerTitle}>Quiz History</Text>
           <View style={{ width: 40 }} />
         </View>
         <View style={styles.centered}>
-          <Ionicons name="time-outline" size={64} color="#c8d8d5" />
+          <Ionicons name="time-outline" size={64} color={theme.colors.lightGrayIcon} />
           <Text style={styles.emptyTitle}>No Attempts Yet</Text>
           <Text style={styles.emptySubtitle}>
             Complete a quiz to see your history here.
@@ -146,7 +147,7 @@ export function NotebookQuizHistory() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.headerButton}>
-          <Ionicons name="arrow-back" size={24} color="#117864" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
         </Pressable>
         <Text style={styles.headerTitle}>Quiz History</Text>
         <View style={{ width: 40 }} />
@@ -168,7 +169,7 @@ export function NotebookQuizHistory() {
             <Text style={styles.statLabel}>Avg Score</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={[styles.statValue, { color: "#117864" }]}>
+            <Text style={[styles.statValue, { color: theme.colors.primary }]}>
               {Math.round(
                 (bestAttempt.score / bestAttempt.totalQuestions) * 100,
               )}
@@ -189,7 +190,7 @@ export function NotebookQuizHistory() {
                 <Ionicons
                   name="document-text-outline"
                   size={16}
-                  color="#117864"
+                  color={theme.colors.primary}
                 />
                 <Text style={styles.quizSectionTitle} numberOfLines={1}>
                   {quiz.title}
@@ -255,7 +256,7 @@ export function NotebookQuizHistory() {
                       <Ionicons
                         name={isExpanded ? "chevron-up" : "chevron-down"}
                         size={16}
-                        color="#9ca3af"
+                        color={theme.colors.textMuted}
                         style={{ marginLeft: 8 }}
                       />
                     </Pressable>
@@ -275,7 +276,7 @@ export function NotebookQuizHistory() {
                                   correct ? "checkmark-circle" : "close-circle"
                                 }
                                 size={16}
-                                color={correct ? "#2e7d32" : "#c62828"}
+                                color={correct ? theme.colors.accentGreen : theme.colors.textError}
                               />
                               <View style={{ flex: 1 }}>
                                 <Text
@@ -322,7 +323,7 @@ export function NotebookQuizHistory() {
                 <Ionicons
                   name="document-text-outline"
                   size={16}
-                  color="#117864"
+                  color={theme.colors.primary}
                 />
                 <Text style={styles.quizSectionTitle}>{quiz.title}</Text>
                 <Text style={styles.quizAttemptCount}>No attempts</Text>

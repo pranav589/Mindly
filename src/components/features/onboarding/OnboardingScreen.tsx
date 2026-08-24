@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -31,7 +32,7 @@ export default function OnboardingScreen() {
         "Upload documents, notes, and fragments. Our system structures the chaos into a clean, searchable base.",
       icon: "cloud-upload-outline",
       bgStyle: { backgroundColor: "rgba(162, 217, 206, 0.2)" },
-      iconColor: "#117864",
+      iconColor: theme.colors.primary,
     },
     {
       title: "Analyze Connections",
@@ -39,7 +40,7 @@ export default function OnboardingScreen() {
         "Discover hidden patterns. We automatically synthesize relationships to surface insights you might miss.",
       icon: "git-network-outline",
       bgStyle: { backgroundColor: "rgba(17, 120, 100, 0.1)" },
-      iconColor: "#005d4d",
+      iconColor: theme.colors.primaryDark,
     },
     {
       title: "Study with Focus",
@@ -47,7 +48,7 @@ export default function OnboardingScreen() {
         "Enter a distraction-free zone. Review tailored summaries and test your comprehension in an optimized space.",
       icon: "school-outline",
       bgStyle: { backgroundColor: "rgba(218, 247, 166, 0.2)" },
-      iconColor: "#42591a",
+      iconColor: theme.colors.onboardingTertiary,
     },
   ];
 
@@ -136,7 +137,7 @@ export default function OnboardingScreen() {
           <Text style={styles.buttonLabel}>
             {activeIndex === slides.length - 1 ? "Get Started" : "Next"}
           </Text>
-          <Ionicons name="arrow-forward" size={16} color="#ffffff" />
+          <Ionicons name="arrow-forward" size={16} color={theme.colors.textLight} />
         </Button>
       </View>
     </View>

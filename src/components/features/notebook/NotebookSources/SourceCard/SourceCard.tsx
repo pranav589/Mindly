@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
@@ -20,13 +21,13 @@ export function SourceCard({ source, onLongPress }: SourceCardProps) {
       {/* Type Icon */}
       <View style={styles.typeIconContainer}>
         {source.type === "pdf" ? (
-          <MaterialIcons name="picture-as-pdf" size={20} color="#6e7a75" />
+          <MaterialIcons name="picture-as-pdf" size={20} color={theme.colors.textSecondary} />
         ) : source.type === "youtube" ? (
-          <Ionicons name="play-circle-outline" size={20} color="#6e7a75" />
+          <Ionicons name="play-circle-outline" size={20} color={theme.colors.textSecondary} />
         ) : source.type === "image" ? (
-          <Ionicons name="image-outline" size={20} color="#6e7a75" />
+          <Ionicons name="image-outline" size={20} color={theme.colors.textSecondary} />
         ) : (
-          <Ionicons name="link-outline" size={20} color="#6e7a75" />
+          <Ionicons name="link-outline" size={20} color={theme.colors.textSecondary} />
         )}
       </View>
 
@@ -55,11 +56,11 @@ export function SourceCard({ source, onLongPress }: SourceCardProps) {
 
       {/* Status Indicator */}
       {isProcessing ? (
-        <ActivityIndicator size="small" color="#117864" />
+        <ActivityIndicator size="small" color={theme.colors.primary} />
       ) : source.status === "failed" ? (
-        <Ionicons name="close-circle" size={20} color="#dc2626" />
+        <Ionicons name="close-circle" size={20} color={theme.colors.textError} />
       ) : (
-        <Ionicons name="checkmark-circle" size={20} color="#117864" />
+        <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
       )}
     </Pressable>
   );

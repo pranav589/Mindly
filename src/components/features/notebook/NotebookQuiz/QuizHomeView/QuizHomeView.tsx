@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import ScreenHeader from "@/components/ScreenHeader/ScreenHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -73,7 +74,7 @@ export function QuizHomeView({
       />
 
       <ScrollView contentContainerStyle={[styles.content, styles.centered]}>
-        <Ionicons name="school-outline" size={72} color="#117864" />
+        <Ionicons name="school-outline" size={72} color={theme.colors.primary} />
 
         {!activeQuiz ? (
           <>
@@ -82,7 +83,7 @@ export function QuizHomeView({
               Generate an AI-powered quiz from your notebook sources.
             </Text>
             <Pressable onPress={onRegenerate} style={styles.primaryButton}>
-              <Ionicons name="sparkles-outline" size={18} color="#fff" />
+              <Ionicons name="sparkles-outline" size={18} color={theme.colors.textLight} />
               <Text style={styles.primaryButtonText}>Generate Quiz</Text>
             </Pressable>
           </>
@@ -123,7 +124,7 @@ export function QuizHomeView({
                 {attempts.slice(0, 3).map((a, i) => {
                   const pct = Math.round((a.score / a.totalQuestions) * 100);
                   const color =
-                    pct >= 70 ? "#2e7d32" : pct >= 40 ? "#f57c00" : "#c62828";
+                    pct >= 70 ? theme.colors.accentGreen : pct >= 40 ? theme.colors.accentOrange : theme.colors.textError;
                   const dotColor = { backgroundColor: color };
                   const scoreColor = { color };
                   return (
@@ -142,7 +143,7 @@ export function QuizHomeView({
             )}
 
             <Pressable onPress={startQuiz} style={styles.primaryButton}>
-              <Ionicons name="play" size={18} color="#fff" />
+              <Ionicons name="play" size={18} color={theme.colors.textLight} />
               <Text style={styles.primaryButtonText}>
                 {attempts.length > 0 ? "Retake Quiz" : "Start Quiz"}
               </Text>
@@ -152,7 +153,7 @@ export function QuizHomeView({
               onPress={handleRegeneratePress}
               style={styles.outlineButton}
             >
-              <Ionicons name="refresh-outline" size={18} color="#117864" />
+              <Ionicons name="refresh-outline" size={18} color={theme.colors.primary} />
               <Text style={styles.outlineButtonText}>Regenerate Quiz</Text>
             </Pressable>
           </>

@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   cardWrapper: {
@@ -19,9 +20,9 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     backfaceVisibility: "hidden",
     borderWidth: 1,
-    borderColor: "#e0e6e6",
-    backgroundColor: "#ffffff",
-    shadowColor: "#117864",
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.08,
     shadowRadius: 16,
@@ -31,7 +32,7 @@ export const styles = StyleSheet.create({
     zIndex: 1,
   },
   cardBack: {
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.surface,
   },
   cardLabel: {
     position: "absolute",
@@ -39,16 +40,16 @@ export const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "bold",
     letterSpacing: 1.5,
-    color: "#117864",
+    color: theme.colors.primary,
   },
   cardText: {
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#2c3e50",
+    color: theme.colors.textDark,
     lineHeight: 30,
   },
   cardLabelBack: {
-    color: "#2e7d32",
+    color: theme.colors.success,
   },
 });

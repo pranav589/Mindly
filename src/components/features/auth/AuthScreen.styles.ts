@@ -1,10 +1,11 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const getStyles = (insets: { top: number; bottom: number }) =>
   StyleSheet.create({
     root: {
       flex: 1,
-      backgroundColor: "#f8fafa",
+      backgroundColor: theme.colors.background,
     },
     scroll: {
       paddingHorizontal: 24,
@@ -36,12 +37,12 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     logoCircle: {
       width: 64,
       height: 64,
-      backgroundColor: "#117864",
+      backgroundColor: theme.colors.primary,
       borderRadius: 9999,
       alignItems: "center",
       justifyContent: "center",
       marginBottom: 12,
-      shadowColor: "#117864",
+      shadowColor: theme.colors.primary,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.15,
       shadowRadius: 10,
@@ -50,17 +51,17 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     appName: {
       fontSize: 30,
       fontWeight: "bold",
-      color: "#117864",
+      color: theme.colors.primary,
       letterSpacing: -0.5,
     },
     appTagline: {
       fontSize: 14,
-      color: "#6b7280",
+      color: theme.colors.gray500,
       marginTop: 4,
     },
     tabsRow: {
       flexDirection: "row",
-      backgroundColor: "#f3f4f6",
+      backgroundColor: theme.colors.gray100,
       borderRadius: 8,
       padding: 4,
       marginBottom: 24,
@@ -72,7 +73,7 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       alignItems: "center",
     },
     tabActive: {
-      backgroundColor: "#ffffff",
+      backgroundColor: theme.colors.surface,
       elevation: 1,
     },
     tabText: {
@@ -80,10 +81,10 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       fontWeight: "600",
     },
     tabTextActive: {
-      color: "#117864",
+      color: theme.colors.primary,
     },
     tabTextInactive: {
-      color: "#6b7280",
+      color: theme.colors.gray500,
     },
     formContainer: {
       gap: 16,
@@ -94,14 +95,14 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     fieldLabel: {
       fontSize: 12,
       fontWeight: "600",
-      color: "#6b7280",
+      color: theme.colors.gray500,
     },
     inputRow: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: "#ffffff",
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: "#e0e6e6",
+      borderColor: theme.colors.border,
       borderRadius: 8,
       paddingHorizontal: 12,
       paddingVertical: 10,
@@ -112,7 +113,7 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     textInput: {
       flex: 1,
       fontSize: 14,
-      color: "#1f2937",
+      color: theme.colors.text,
     },
     eyeButton: {
       padding: 4,
@@ -132,23 +133,23 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       width: 16,
       height: 16,
       borderWidth: 1,
-      borderColor: "#e0e6e6",
+      borderColor: theme.colors.border,
       borderRadius: 4,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "#ffffff",
+      backgroundColor: theme.colors.surface,
     },
     checkboxChecked: {
       backgroundColor: "rgba(17, 120, 100, 0.1)",
-      borderColor: "#117864",
+      borderColor: theme.colors.primary,
     },
     rememberLabel: {
       fontSize: 12,
-      color: "#6b7280",
+      color: theme.colors.gray500,
     },
     forgotText: {
       fontSize: 12,
-      color: "#117864",
+      color: theme.colors.primary,
       fontWeight: "600",
     },
     submitButton: {
@@ -162,11 +163,11 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     dividerLine: {
       flex: 1,
       height: 1,
-      backgroundColor: "#e0e6e6",
+      backgroundColor: theme.colors.border,
     },
     dividerText: {
       fontSize: 12,
-      color: "#9ca3af",
+      color: theme.colors.gray400,
       paddingHorizontal: 12,
     },
     socialRow: {
@@ -181,16 +182,16 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       gap: 8,
       paddingVertical: 10,
       borderWidth: 1,
-      borderColor: "#e0e6e6",
+      borderColor: theme.colors.border,
       borderRadius: 8,
-      backgroundColor: "#ffffff",
+      backgroundColor: theme.colors.surface,
     },
     socialButtonPressed: {
-      backgroundColor: "#f9fafb",
+      backgroundColor: theme.colors.gray50,
     },
     socialText: {
       fontSize: 12,
       fontWeight: "600",
-      color: "#374151",
+      color: theme.colors.gray700,
     },
   });

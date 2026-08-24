@@ -1,16 +1,17 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   sourceCard: {
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
-    backgroundColor: "#ffffff",
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: "#e0e6e6",
+    borderColor: theme.colors.border,
     borderRadius: 24,
     marginBottom: 12,
-    shadowColor: "#000",
+    shadowColor: theme.colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -18,13 +19,13 @@ export const styles = StyleSheet.create({
   },
   processingCard: {
     borderLeftWidth: 4,
-    borderLeftColor: "#a2d9ce",
+    borderLeftColor: theme.colors.primaryLight,
   },
   typeIconContainer: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#f0f2f2",
+    backgroundColor: theme.colors.gray100,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -37,7 +38,7 @@ export const styles = StyleSheet.create({
   sourceName: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#191c1d",
+    color: theme.colors.textDark,
     marginBottom: 4,
   },
   sourceTime: {
@@ -45,12 +46,12 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
   },
   sourceStatusSynced: {
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
   },
   sourceStatusSyncing: {
-    color: "#117864",
+    color: theme.colors.primary,
   },
   sourceStatusFailed: {
-    color: "#dc2626",
+    color: theme.colors.textError,
   },
 });

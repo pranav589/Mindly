@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   container: {
@@ -8,10 +9,10 @@ export const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#117864",
+    shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -24,7 +25,7 @@ export const styles = StyleSheet.create({
     height: 66,
     borderRadius: 33,
     borderWidth: 2,
-    borderColor: "#117864",
+    borderColor: theme.colors.primary,
     opacity: 0.5,
   },
   closeBadge: {
@@ -34,12 +35,12 @@ export const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: "#ffffff",
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
     borderColor: "rgba(17, 120, 100, 0.15)",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: theme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 3,

@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   messageRow: {
@@ -8,14 +9,14 @@ export const styles = StyleSheet.create({
   userBubble: {
     alignSelf: "flex-end",
     maxWidth: "85%",
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 16,
     borderTopRightRadius: 0,
   },
   userText: {
-    color: "#ffffff",
+    color: theme.colors.textLight,
     fontSize: 14,
     lineHeight: 20,
   },
@@ -33,29 +34,29 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     flexShrink: 0,
     marginTop: 2,
-    backgroundColor: "rgba(162, 217, 206, 0.35)",
+    backgroundColor: theme.colors.primarySubtle,
   },
   aiBubble: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: theme.colors.borderMuted,
     borderRadius: 16,
     borderTopLeftRadius: 0,
     padding: 12,
-    shadowColor: "#000",
+    shadowColor: theme.colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
   },
   aiText: {
-    color: "#111827",
+    color: theme.colors.textHeading,
     fontSize: 14,
     lineHeight: 20,
   },
   clickableCitation: {
-    color: "#005d4d",
+    color: theme.colors.primaryDark,
     fontWeight: "bold",
     fontSize: 12,
     backgroundColor: "rgba(162, 217, 206, 0.3)",

@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
   },
   centered: {
     flex: 1,
@@ -13,7 +14,7 @@ export const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     fontSize: 14,
   },
   header: {
@@ -23,7 +24,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderColor: "#e0e6e6",
+    borderColor: theme.colors.border,
   },
   headerButton: {
     padding: 8,
@@ -31,7 +32,7 @@ export const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#117864",
+    color: theme.colors.primary,
     flex: 1,
     textAlign: "center",
   },
@@ -40,7 +41,7 @@ export const styles = StyleSheet.create({
   },
   webviewContainer: {
     flex: 1,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
   },
   webview: {
     flex: 1,
@@ -49,12 +50,12 @@ export const styles = StyleSheet.create({
   generatingTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginTop: 20,
   },
   generatingSubtitle: {
     fontSize: 13,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     textAlign: "center",
     marginTop: 8,
     lineHeight: 18,
@@ -62,12 +63,12 @@ export const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginTop: 16,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     textAlign: "center",
     marginTop: 8,
     marginBottom: 24,
@@ -78,13 +79,13 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     paddingVertical: 14,
     paddingHorizontal: 28,
     borderRadius: 16,
   },
   primaryButtonText: {
-    color: "#fff",
+    color: theme.colors.textLight,
     fontWeight: "bold",
     fontSize: 15,
   },
@@ -108,31 +109,31 @@ export const styles = StyleSheet.create({
     fontWeight: "800",
   },
   diffGreen: {
-    backgroundColor: "#e8f5e9",
-    borderColor: "#a5d6a7",
+    backgroundColor: theme.colors.successLight,
+    borderColor: theme.colors.successBorder,
   },
   diffOrange: {
-    backgroundColor: "#fff3e0",
-    borderColor: "#ffcc80",
+    backgroundColor: theme.colors.warningLight,
+    borderColor: theme.colors.warningBorder,
   },
   diffRed: {
-    backgroundColor: "#ffebee",
-    borderColor: "#ef9a9a",
+    backgroundColor: theme.colors.errorLight,
+    borderColor: theme.colors.errorBorder,
   },
   textGreen: {
-    color: "#2e7d32",
+    color: theme.colors.accentGreen,
   },
   textOrange: {
-    color: "#ef6c00",
+    color: theme.colors.accentOrange,
   },
   textRed: {
-    color: "#c62828",
+    color: theme.colors.accentRed,
   },
   sourceTag: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: "#e8f5f3",
+    backgroundColor: theme.colors.primarySubtle,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
@@ -140,11 +141,11 @@ export const styles = StyleSheet.create({
   sourceTagText: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#117864",
+    color: theme.colors.primary,
   },
   nodeDescription: {
     fontSize: 15,
-    color: "#1f2937",
+    color: theme.colors.text,
     lineHeight: 22,
     fontWeight: "500",
   },
@@ -154,13 +155,13 @@ export const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "800",
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   sectionText: {
     fontSize: 13,
-    color: "#4b5563",
+    color: theme.colors.gray700,
     lineHeight: 18,
   },
   bulletRow: {
@@ -171,31 +172,31 @@ export const styles = StyleSheet.create({
   },
   bulletSymbol: {
     fontSize: 14,
-    color: "#117864",
+    color: theme.colors.primary,
     fontWeight: "bold",
   },
   bulletText: {
     flex: 1,
     fontSize: 13,
-    color: "#4b5563",
+    color: theme.colors.gray700,
     lineHeight: 18,
   },
   exampleBox: {
-    backgroundColor: "#f4f6f6",
+    backgroundColor: theme.colors.gray50,
     borderRadius: 10,
     padding: 12,
     borderLeftWidth: 3,
-    borderLeftColor: "#117864",
+    borderLeftColor: theme.colors.primary,
   },
   exampleText: {
     fontSize: 13,
-    color: "#374151",
+    color: theme.colors.text,
     fontStyle: "italic",
     lineHeight: 18,
   },
   questionText: {
     fontSize: 13,
-    color: "#4b5563",
+    color: theme.colors.gray500,
     lineHeight: 18,
     fontStyle: "italic",
     paddingLeft: 4,

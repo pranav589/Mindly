@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, View } from "react-native";
@@ -62,7 +63,7 @@ export const MessageRow = React.memo(
               <Ionicons
                 name="hardware-chip-outline"
                 size={16}
-                color="#005d4d"
+                color={theme.colors.primaryDark}
               />
             </View>
 

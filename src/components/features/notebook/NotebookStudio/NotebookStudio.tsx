@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -19,7 +20,7 @@ export function NotebookStudio() {
       icon: "map-outline",
       bg: "rgba(17, 120, 100, 0.08)",
       iconBg: "rgba(17, 120, 100, 0.15)",
-      color: "#117864",
+      color: theme.colors.primary,
       route: `/notebook/${id}/roadmap`,
     },
     {
@@ -29,7 +30,7 @@ export function NotebookStudio() {
       icon: "git-merge-outline",
       bg: "rgba(218, 247, 166, 0.15)",
       iconBg: "rgba(218, 247, 166, 0.35)",
-      color: "#42591a",
+      color: theme.colors.onboardingTertiary,
       route: `/notebook/${id}/mindmap`,
     },
     {
@@ -39,7 +40,7 @@ export function NotebookStudio() {
       icon: "albums-outline",
       bg: "rgba(59, 130, 246, 0.08)",
       iconBg: "rgba(59, 130, 246, 0.15)",
-      color: "#2563eb",
+      color: theme.colors.accentBlue,
       route: `/notebook/${id}/flashcard`,
     },
     {
@@ -49,7 +50,7 @@ export function NotebookStudio() {
       icon: "checkbox-outline",
       bg: "rgba(245, 158, 11, 0.08)",
       iconBg: "rgba(245, 158, 11, 0.15)",
-      color: "#d97706",
+      color: theme.colors.studioOrange,
       route: `/notebook/${id}/quiz`,
     },
   ];
@@ -70,7 +71,7 @@ export function NotebookStudio() {
             pressed && styles.pressedOpacity,
           ]}
         >
-          <Ionicons name="arrow-back" size={24} color="#117864" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
         </Pressable>
         <Text style={styles.headerTitle}>Study Studio Hub</Text>
         <Pressable
@@ -80,7 +81,7 @@ export function NotebookStudio() {
             pressed && styles.pressedOpacity,
           ]}
         >
-          <Ionicons name="person-add-outline" size={20} color="#117864" />
+          <Ionicons name="person-add-outline" size={20} color={theme.colors.primary} />
         </Pressable>
       </View>
 
@@ -114,7 +115,7 @@ export function NotebookStudio() {
         >
           <View style={styles.podcastLeft}>
             <View style={styles.podcastIconContainer}>
-              <Ionicons name="headset-outline" size={28} color="#ffffff" />
+              <Ionicons name="headset-outline" size={28} color={theme.colors.textLight} />
             </View>
             <View style={styles.podcastMeta}>
               <Text style={styles.podcastTitle}>Overview Podcast</Text>
@@ -124,7 +125,7 @@ export function NotebookStudio() {
             </View>
           </View>
           <View style={styles.podcastRight}>
-            <Ionicons name="play-circle" size={44} color="#117864" />
+            <Ionicons name="play-circle" size={44} color={theme.colors.primary} />
           </View>
         </Pressable>
 

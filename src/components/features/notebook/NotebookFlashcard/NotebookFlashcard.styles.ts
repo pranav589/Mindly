@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
   },
   centered: {
     flex: 1,
@@ -13,16 +14,16 @@ export const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     fontSize: 14,
   },
   progressTrack: {
     height: 4,
-    backgroundColor: "#e0e6e6",
+    backgroundColor: theme.colors.border,
   },
   progressFill: {
     height: 4,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     borderRadius: 2,
   },
   content: {
@@ -33,13 +34,13 @@ export const styles = StyleSheet.create({
   counter: {
     fontSize: 13,
     fontWeight: "bold",
-    color: "#117864",
+    color: theme.colors.primary,
     textTransform: "uppercase",
     letterSpacing: 1,
   },
   flipHint: {
     fontSize: 12,
-    color: "#9ca3af",
+    color: theme.colors.textMuted,
     marginTop: 4,
     marginBottom: 24,
     textTransform: "uppercase",
@@ -53,7 +54,7 @@ export const styles = StyleSheet.create({
   ratingLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     marginBottom: 16,
   },
   ratingRow: {
@@ -79,32 +80,32 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   rateBtnAgain: {
-    backgroundColor: "#ffebee",
-    borderColor: "#ef9a9a",
+    backgroundColor: theme.colors.errorLight,
+    borderColor: theme.colors.errorBorder,
   },
   rateBtnTextAgain: {
-    color: "#c62828",
+    color: theme.colors.accentRed,
   },
   rateBtnHard: {
-    backgroundColor: "#fff3e0",
-    borderColor: "#ffcc80",
+    backgroundColor: theme.colors.warningLight,
+    borderColor: theme.colors.warningBorder,
   },
   rateBtnTextHard: {
-    color: "#ef6c00",
+    color: theme.colors.accentOrange,
   },
   rateBtnGood: {
-    backgroundColor: "#e8f5e9",
-    borderColor: "#a5d6a7",
+    backgroundColor: theme.colors.successLight,
+    borderColor: theme.colors.successBorder,
   },
   rateBtnTextGood: {
-    color: "#2e7d32",
+    color: theme.colors.accentGreen,
   },
   rateBtnEasy: {
-    backgroundColor: "#e3f2fd",
-    borderColor: "#90caf9",
+    backgroundColor: theme.colors.infoLight,
+    borderColor: theme.colors.infoBorder,
   },
   rateBtnTextEasy: {
-    color: "#1565c0",
+    color: theme.colors.infoText,
   },
   skipButton: {
     flexDirection: "row",
@@ -114,24 +115,24 @@ export const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 24,
     borderWidth: 1.5,
-    borderColor: "#117864",
+    borderColor: theme.colors.primary,
     width: "100%",
     marginTop: "auto",
   },
   skipButtonText: {
-    color: "#117864",
+    color: theme.colors.primary,
     fontSize: 14,
     fontWeight: "bold",
   },
   emptyTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginTop: 16,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     textAlign: "center",
     marginTop: 8,
     marginBottom: 24,
@@ -142,13 +143,13 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     paddingVertical: 14,
     paddingHorizontal: 28,
     borderRadius: 16,
   },
   primaryButtonText: {
-    color: "#fff",
+    color: theme.colors.textLight,
     fontWeight: "bold",
     fontSize: 15,
   },

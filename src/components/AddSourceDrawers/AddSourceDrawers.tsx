@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as DocumentPicker from "expo-document-picker";
@@ -172,7 +173,7 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
             ]}
           >
             <View style={styles.sourceIconContainer}>
-              <MaterialIcons name="picture-as-pdf" size={24} color="#117864" />
+              <MaterialIcons name="picture-as-pdf" size={24} color={theme.colors.primary} />
             </View>
             <Text style={styles.sourceButtonText}>Upload PDF</Text>
           </Pressable>
@@ -188,7 +189,7 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
             ]}
           >
             <View style={styles.sourceIconContainer}>
-              <Ionicons name="play-circle-outline" size={24} color="#117864" />
+              <Ionicons name="play-circle-outline" size={24} color={theme.colors.primary} />
             </View>
             <Text style={styles.sourceButtonText}>YouTube Link</Text>
           </Pressable>
@@ -204,7 +205,7 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
             ]}
           >
             <View style={styles.sourceIconContainer}>
-              <Ionicons name="link-outline" size={24} color="#117864" />
+              <Ionicons name="link-outline" size={24} color={theme.colors.primary} />
             </View>
             <Text style={styles.sourceButtonText}>Web URL</Text>
           </Pressable>
@@ -223,7 +224,7 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
               <Ionicons
                 name="document-text-outline"
                 size={24}
-                color="#117864"
+                color={theme.colors.primary}
               />
             </View>
             <Text style={styles.sourceButtonText}>Paste Text</Text>
@@ -238,7 +239,7 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
             ]}
           >
             <View style={styles.sourceIconContainer}>
-              <Ionicons name="camera-outline" size={24} color="#117864" />
+              <Ionicons name="camera-outline" size={24} color={theme.colors.primary} />
             </View>
             <Text style={styles.sourceButtonText}>Scan (Camera)</Text>
           </Pressable>
@@ -252,7 +253,7 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
             ]}
           >
             <View style={styles.sourceIconContainer}>
-              <Ionicons name="images-outline" size={24} color="#117864" />
+              <Ionicons name="images-outline" size={24} color={theme.colors.primary} />
             </View>
             <Text style={styles.sourceButtonText}>Select Image</Text>
           </Pressable>
@@ -263,7 +264,7 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
         <View>
           <TextInput
             placeholder="https://example.com/article"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={theme.colors.textMuted}
             value={webUrl}
             onChangeText={setWebUrl}
             style={styles.drawerInput}
@@ -280,7 +281,7 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
         <View>
           <TextInput
             placeholder="https://youtube.com/watch?v=..."
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={theme.colors.textMuted}
             value={youtubeUrl}
             onChangeText={setYoutubeUrl}
             style={styles.drawerInput}
@@ -300,14 +301,14 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
         <View>
           <TextInput
             placeholder="Title (e.g. Lecture Notes)"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={theme.colors.textMuted}
             value={textTitle}
             onChangeText={setTextTitle}
             style={styles.drawerInputTitle}
           />
           <TextInput
             placeholder="Paste or type content here..."
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={theme.colors.textMuted}
             value={textContent}
             onChangeText={setTextContent}
             style={styles.drawerInputContent}

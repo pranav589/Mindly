@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
   },
   centered: {
     flex: 1,
@@ -13,7 +14,7 @@ export const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     fontSize: 14,
   },
   scrollView: {
@@ -39,28 +40,28 @@ export const styles = StyleSheet.create({
   tagText: {
     fontSize: 10,
     fontWeight: "bold",
-    color: "#117864",
+    color: theme.colors.primary,
   },
   titleText: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textDark,
     marginBottom: 4,
   },
   descriptionText: {
     fontSize: 14,
-    color: "#6b7280",
+    color: theme.colors.textSecondary,
     lineHeight: 20,
   },
   generatingTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginTop: 20,
   },
   generatingSubtitle: {
     fontSize: 13,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     textAlign: "center",
     marginTop: 8,
     lineHeight: 18,
@@ -68,12 +69,12 @@ export const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginTop: 16,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: "#6e7a75",
+    color: theme.colors.textSecondary,
     textAlign: "center",
     marginTop: 8,
     marginBottom: 24,
@@ -84,13 +85,13 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     paddingVertical: 14,
     paddingHorizontal: 28,
     borderRadius: 16,
   },
   primaryButtonText: {
-    color: "#fff",
+    color: theme.colors.textLight,
     fontWeight: "bold",
     fontSize: 15,
   },

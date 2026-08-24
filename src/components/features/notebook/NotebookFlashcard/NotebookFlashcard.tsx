@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import ScreenHeader from "@/components/ScreenHeader/ScreenHeader";
 import { useNotifications } from "@/context/NotificationContext";
 import { apiClient } from "@/services/api";
@@ -161,7 +162,7 @@ export function NotebookFlashcard() {
   if (isFetchingCards || generateCardsMutation.isPending) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#117864" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>
           {generateCardsMutation.isPending
             ? "Generating flashcards…"
@@ -178,7 +179,7 @@ export function NotebookFlashcard() {
         <ScreenHeader title="Flashcards" />
 
         <View style={styles.centered}>
-          <Ionicons name="layers-outline" size={72} color="#c8d8d5" />
+          <Ionicons name="layers-outline" size={72} color={theme.colors.lightGrayIcon} />
           <Text style={styles.emptyTitle}>No Flashcards Yet</Text>
           <Text style={styles.emptySubtitle}>
             Generate AI flashcards from your notebook sources.
@@ -194,7 +195,7 @@ export function NotebookFlashcard() {
             }}
             style={styles.primaryButton}
           >
-            <Ionicons name="sparkles-outline" size={18} color="#fff" />
+            <Ionicons name="sparkles-outline" size={18} color={theme.colors.textLight} />
             <Text style={styles.primaryButtonText}>Generate Flashcards</Text>
           </Pressable>
         </View>
@@ -287,7 +288,7 @@ export function NotebookFlashcard() {
         ) : (
           <Pressable onPress={goToNext} style={styles.skipButton}>
             <Text style={styles.skipButtonText}>Skip</Text>
-            <Ionicons name="arrow-forward" size={16} color="#117864" />
+            <Ionicons name="arrow-forward" size={16} color={theme.colors.primary} />
           </Pressable>
         )}
       </View>

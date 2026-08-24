@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Modal, StyleSheet, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { theme } from "@/theme/themes";
 
 interface BottomSheetProps {
   isOpen: boolean;
@@ -117,12 +118,12 @@ export default function BottomSheet({
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: "#ffffff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: theme.colors.surface,
+    borderTopLeftRadius: theme.borderRadius.xl,
+    borderTopRightRadius: theme.borderRadius.xl,
   },
   handleIndicator: {
-    backgroundColor: "#e1e3e3",
+    backgroundColor: theme.colors.border,
     width: 40,
     height: 5,
   },
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#191c1d",
+    color: theme.colors.textDark,
     paddingLeft: 4,
   },
   childrenWrapper: {

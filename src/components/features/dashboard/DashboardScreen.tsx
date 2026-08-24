@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
@@ -86,7 +87,7 @@ export default function DashboardScreen() {
             <Text style={styles.workspaceText}>Workspace</Text>
             <Pressable style={styles.workspaceSelector}>
               <Text style={styles.workspaceType}>Personal</Text>
-              <Ionicons name="chevron-down" size={14} color="#6e7a75" />
+              <Ionicons name="chevron-down" size={14} color={theme.colors.textSecondary} />
             </Pressable>
           </View>
         </View>
@@ -97,7 +98,7 @@ export default function DashboardScreen() {
             { opacity: pressed ? 0.7 : 1 },
           ]}
         >
-          <Ionicons name="search-outline" size={22} color="#005d4d" />
+          <Ionicons name="search-outline" size={22} color={theme.colors.primaryDark} />
         </Pressable>
       </View>
 
@@ -111,7 +112,7 @@ export default function DashboardScreen() {
           <Ionicons
             name="search-outline"
             size={20}
-            color="#6e7a75"
+            color={theme.colors.textSecondary}
             style={styles.searchIcon}
           />
           <TextInput
@@ -119,10 +120,10 @@ export default function DashboardScreen() {
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={styles.searchInput}
-            placeholderTextColor="#bdc9c4"
+            placeholderTextColor={theme.colors.placeholder}
           />
           <Pressable style={styles.micButton}>
-            <Ionicons name="mic-outline" size={20} color="#6e7a75" />
+            <Ionicons name="mic-outline" size={20} color={theme.colors.textSecondary} />
           </Pressable>
         </View>
 
@@ -135,7 +136,7 @@ export default function DashboardScreen() {
               { opacity: pressed ? 0.7 : 1 },
             ]}
           >
-            <Ionicons name="filter-outline" size={20} color="#6e7a75" />
+            <Ionicons name="filter-outline" size={20} color={theme.colors.textSecondary} />
           </Pressable>
         </View>
 
@@ -160,7 +161,7 @@ export default function DashboardScreen() {
                     name={(notebook.icon || "book") as any}
                     size={20}
                     color={
-                      notebook.theme === "tertiary" ? "#42591a" : "#005d4d"
+                      notebook.theme === "tertiary" ? theme.colors.onboardingTertiary : theme.colors.primaryDark
                     }
                   />
                 </View>
@@ -182,7 +183,7 @@ export default function DashboardScreen() {
             ]}
           >
             <View style={styles.addNotebookIconContainer}>
-              <Ionicons name="add" size={24} color="#6e7a75" />
+              <Ionicons name="add" size={24} color={theme.colors.textSecondary} />
             </View>
             <Text style={styles.addNotebookText}>Blank Notebook</Text>
           </Pressable>
@@ -212,7 +213,7 @@ export default function DashboardScreen() {
               styles.drawerItemIconContainerPrimary,
             ]}
           >
-            <Ionicons name="document-text-outline" size={20} color="#117864" />
+            <Ionicons name="document-text-outline" size={20} color={theme.colors.primary} />
           </View>
           <Text style={styles.drawerItemText}>New Blank Notebook</Text>
         </Pressable>
@@ -228,7 +229,7 @@ export default function DashboardScreen() {
           ]}
         >
           <View style={styles.drawerItemIconContainer}>
-            <Ionicons name="cloud-upload-outline" size={20} color="#6e7a75" />
+            <Ionicons name="cloud-upload-outline" size={20} color={theme.colors.textSecondary} />
           </View>
           <Text style={styles.drawerItemText}>Import from Drive</Text>
         </Pressable>
@@ -244,7 +245,7 @@ export default function DashboardScreen() {
           ]}
         >
           <View style={styles.drawerItemIconContainer}>
-            <Ionicons name="scan-outline" size={20} color="#6e7a75" />
+            <Ionicons name="scan-outline" size={20} color={theme.colors.textSecondary} />
           </View>
           <Text style={styles.drawerItemText}>Scan Document</Text>
         </Pressable>
@@ -260,7 +261,7 @@ export default function DashboardScreen() {
           ]}
         >
           <View style={styles.drawerItemIconContainer}>
-            <Ionicons name="share-social-outline" size={20} color="#6e7a75" />
+            <Ionicons name="share-social-outline" size={20} color={theme.colors.textSecondary} />
           </View>
           <Text style={styles.drawerItemText}>Share Workspace</Text>
         </Pressable>
@@ -285,7 +286,7 @@ export default function DashboardScreen() {
             <TextInput
               style={styles.modalInput}
               placeholder="e.g. History Exam Notes"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor={theme.colors.textMuted}
               value={newNotebookName}
               onChangeText={setNewNotebookName}
               autoFocus={true}

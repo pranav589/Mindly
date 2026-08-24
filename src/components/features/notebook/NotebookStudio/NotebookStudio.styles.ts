@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
   },
   header: {
     flexDirection: "row",
@@ -11,7 +12,7 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
   },
   headerButton: {
     padding: 8,
@@ -21,7 +22,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     fontWeight: "bold",
     fontSize: 18,
-    color: "#117864",
+    color: theme.colors.primary,
     textAlign: "center",
     paddingHorizontal: 16,
   },
@@ -52,34 +53,34 @@ export const styles = StyleSheet.create({
   tagText: {
     fontSize: 10,
     fontWeight: "bold",
-    color: "#117864",
+    color: theme.colors.primary,
   },
   updatedText: {
     fontSize: 11,
-    color: "#9ca3af",
+    color: theme.colors.textMuted,
   },
   titleText: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textDark,
     marginBottom: 4,
   },
   descriptionText: {
     fontSize: 14,
-    color: "#6b7280",
+    color: theme.colors.textSecondary,
     lineHeight: 20,
   },
   podcastCard: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#ffffff",
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: "#e0e6e6",
+    borderColor: theme.colors.border,
     borderRadius: 24,
     padding: 16,
     marginBottom: 28,
-    shadowColor: "#117864",
+    shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
     shadowRadius: 15,
@@ -97,7 +98,7 @@ export const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 14,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -107,11 +108,11 @@ export const styles = StyleSheet.create({
   podcastTitle: {
     fontSize: 15,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
   },
   podcastSubtitle: {
     fontSize: 11,
-    color: "#9ca3af",
+    color: theme.colors.textMuted,
     marginTop: 2,
   },
   podcastRight: {
@@ -120,7 +121,7 @@ export const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginBottom: 16,
   },
   gridContainer: {
@@ -155,7 +156,7 @@ export const styles = StyleSheet.create({
   },
   cardSubtitle: {
     fontSize: 11,
-    color: "#6b7280",
+    color: theme.colors.textSecondary,
     fontWeight: "500",
   },
   pressedOpacity: {

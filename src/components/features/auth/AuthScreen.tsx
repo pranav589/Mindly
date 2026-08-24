@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -59,7 +60,7 @@ export default function AuthScreen() {
           {/* Header/Branding */}
           <View style={styles.brandingContainer}>
             <View style={styles.logoCircle}>
-              <Ionicons name="sparkles" size={28} color="#ffffff" />
+              <Ionicons name="sparkles" size={28} color={theme.colors.textLight} />
             </View>
             <Text style={styles.appName}>Mindly</Text>
             <Text style={styles.appTagline}>Your Cognitive Workspace</Text>
@@ -104,7 +105,7 @@ export default function AuthScreen() {
                 <Ionicons
                   name="mail-outline"
                   size={18}
-                  color="#6e7a75"
+                  color={theme.colors.textSecondary}
                   style={styles.inputIcon}
                 />
                 <TextInput
@@ -114,7 +115,7 @@ export default function AuthScreen() {
                   autoCapitalize="none"
                   keyboardType="email-address"
                   style={styles.textInput}
-                  placeholderTextColor="#bdc9c4"
+                  placeholderTextColor={theme.colors.placeholder}
                 />
               </View>
             </View>
@@ -126,7 +127,7 @@ export default function AuthScreen() {
                 <Ionicons
                   name="lock-closed-outline"
                   size={18}
-                  color="#6e7a75"
+                  color={theme.colors.textSecondary}
                   style={styles.inputIcon}
                 />
                 <TextInput
@@ -136,7 +137,7 @@ export default function AuthScreen() {
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
                   style={styles.textInput}
-                  placeholderTextColor="#bdc9c4"
+                  placeholderTextColor={theme.colors.placeholder}
                 />
                 <Pressable
                   onPress={() => setShowPassword(!showPassword)}
@@ -145,7 +146,7 @@ export default function AuthScreen() {
                   <Ionicons
                     name={showPassword ? "eye-off-outline" : "eye-outline"}
                     size={18}
-                    color="#6e7a75"
+                    color={theme.colors.textSecondary}
                   />
                 </Pressable>
               </View>
@@ -164,7 +165,7 @@ export default function AuthScreen() {
                   ]}
                 >
                   {rememberMe && (
-                    <Ionicons name="checkmark" size={12} color="#117864" />
+                    <Ionicons name="checkmark" size={12} color={theme.colors.primary} />
                   )}
                 </View>
                 <Text style={styles.rememberLabel}>Remember me</Text>
@@ -197,7 +198,7 @@ export default function AuthScreen() {
                 pressed && styles.socialButtonPressed,
               ]}
             >
-              <Ionicons name="logo-google" size={18} color="#6e7a75" />
+              <Ionicons name="logo-google" size={18} color={theme.colors.textSecondary} />
               <Text style={styles.socialText}>Google</Text>
             </Pressable>
 
@@ -208,7 +209,7 @@ export default function AuthScreen() {
                 pressed && styles.socialButtonPressed,
               ]}
             >
-              <Ionicons name="logo-apple" size={18} color="#6e7a75" />
+              <Ionicons name="logo-apple" size={18} color={theme.colors.textSecondary} />
               <Text style={styles.socialText}>Apple</Text>
             </Pressable>
           </View>

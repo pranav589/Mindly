@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
@@ -23,7 +24,7 @@ export default function SettingsScreen() {
       {user && (
         <View style={styles.profileCard}>
           <View style={styles.avatarCircle}>
-            <Ionicons name="person" size={32} color="#117864" />
+            <Ionicons name="person" size={32} color={theme.colors.primary} />
           </View>
           <View style={styles.profileInfo}>
             <Text style={styles.userName}>{user.name}</Text>
@@ -35,10 +36,10 @@ export default function SettingsScreen() {
       <View style={styles.buttonWrapper}>
         <Button variant="outline" onPress={logout} style={styles.logoutButton}>
           {isLoggingOut ? (
-            <ActivityIndicator size="small" color="#c0392b" />
+            <ActivityIndicator size="small" color={theme.colors.logoutRed} />
           ) : (
             <View style={styles.logoutContent}>
-              <Ionicons name="log-out-outline" size={18} color="#c0392b" />
+              <Ionicons name="log-out-outline" size={18} color={theme.colors.logoutRed} />
               <Text style={styles.logoutText}>Log Out</Text>
             </View>
           )}

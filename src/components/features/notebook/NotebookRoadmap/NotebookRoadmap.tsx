@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -117,7 +118,7 @@ export function NotebookRoadmap() {
   if (isLoadingNotebook) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#117864" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>Loading notebook details…</Text>
       </View>
     );
@@ -126,7 +127,7 @@ export function NotebookRoadmap() {
   if (isGenerating) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#117864" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.generatingTitle}>Generating Study Roadmap</Text>
         <Text style={styles.generatingSubtitle}>
           {progressText ||
@@ -146,14 +147,14 @@ export function NotebookRoadmap() {
         <StatusBar style="dark" />
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} style={styles.headerButton}>
-            <Ionicons name="arrow-back" size={24} color="#117864" />
+            <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
           </Pressable>
           <Text style={styles.headerTitle}>Syllabus Roadmap</Text>
           <View style={styles.headerPlaceholder} />
         </View>
 
         <View style={styles.centered}>
-          <Ionicons name="map-outline" size={72} color="#c8d8d5" />
+          <Ionicons name="map-outline" size={72} color={theme.colors.lightGrayIcon} />
           <Text style={styles.emptyTitle}>No Roadmap Yet</Text>
           <Text style={styles.emptySubtitle}>
             Create a custom step-by-step study syllabus mapped directly from
@@ -170,7 +171,7 @@ export function NotebookRoadmap() {
             }}
             style={styles.primaryButton}
           >
-            <Ionicons name="sparkles-outline" size={18} color="#fff" />
+            <Ionicons name="sparkles-outline" size={18} color={theme.colors.textLight} />
             <Text style={styles.primaryButtonText}>Generate Study Roadmap</Text>
           </Pressable>
         </View>
@@ -187,11 +188,11 @@ export function NotebookRoadmap() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.headerButton}>
-          <Ionicons name="arrow-back" size={24} color="#117864" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
         </Pressable>
         <Text style={styles.headerTitle}>Syllabus Roadmap</Text>
         <Pressable onPress={handleRegenerate} style={styles.headerButton}>
-          <Ionicons name="refresh-outline" size={22} color="#117864" />
+          <Ionicons name="refresh-outline" size={22} color={theme.colors.primary} />
         </Pressable>
       </View>
 
@@ -241,7 +242,7 @@ export function NotebookRoadmap() {
               <View key={step.id || index} style={styles.timelineStep}>
                 <View style={styles.markerContainer}>
                   <View style={styles.iconCircle}>
-                    <Ionicons name={iconName} size={18} color="#117864" />
+                    <Ionicons name={iconName} size={18} color={theme.colors.primary} />
                   </View>
                   {index < nodes.length - 1 && (
                     <View style={styles.connectorLine} />
@@ -255,7 +256,7 @@ export function NotebookRoadmap() {
 
                   {step.reason && (
                     <View style={styles.reasonBox}>
-                      <Ionicons name="bulb-outline" size={14} color="#85929e" />
+                      <Ionicons name="bulb-outline" size={14} color={theme.colors.grayTextLight} />
                       <Text style={styles.reasonText}>{step.reason}</Text>
                     </View>
                   )}
@@ -274,7 +275,7 @@ export function NotebookRoadmap() {
                       <Ionicons
                         name="document-outline"
                         size={12}
-                        color="#117864"
+                        color={theme.colors.primary}
                       />
                       <Text style={styles.sourceTagText} numberOfLines={1}>
                         Source: {step.sourceName}
@@ -305,7 +306,7 @@ export function NotebookRoadmap() {
                 }
                 size={20}
                 color={
-                  activeSource.sourceType === "youtube" ? "#c62828" : "#117864"
+                  activeSource.sourceType === "youtube" ? theme.colors.accentRed : theme.colors.primary
                 }
               />
               <View style={styles.metaTextContainer}>

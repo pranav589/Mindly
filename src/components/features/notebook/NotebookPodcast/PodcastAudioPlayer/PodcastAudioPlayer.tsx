@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -99,7 +100,7 @@ export function PodcastAudioPlayer({ fullAudioUrl }: PodcastAudioPlayerProps) {
     <View style={styles.playerCard}>
       <View style={styles.playerCardHeader}>
         <View style={styles.podcastIconContainer}>
-          <Ionicons name="mic" size={24} color="#ffffff" />
+          <Ionicons name="mic" size={24} color={theme.colors.textLight} />
         </View>
         <View>
           <Text style={styles.podcastTitle}>Overview Podcast</Text>
@@ -158,20 +159,20 @@ export function PodcastAudioPlayer({ fullAudioUrl }: PodcastAudioPlayerProps) {
           {/* Central controls */}
           <View style={styles.centralControls}>
             <Pressable onPress={() => handleSkip(-10)}>
-              <MaterialIcons name="replay-10" size={32} color="#fff" />
+              <MaterialIcons name="replay-10" size={32} color={theme.colors.textLight} />
             </Pressable>
 
             <Pressable onPress={handlePlayPause} style={styles.playButtonGlow}>
               <Ionicons
                 name={isPlaying ? "pause" : "play"}
                 size={28}
-                color="#fff"
+                color={theme.colors.textLight}
                 style={isPlaying ? styles.playIconNoOffset : styles.playIconOffset}
               />
             </Pressable>
 
             <Pressable onPress={() => handleSkip(10)}>
-              <MaterialIcons name="forward-10" size={32} color="#ffffff" />
+              <MaterialIcons name="forward-10" size={32} color={theme.colors.textLight} />
             </Pressable>
           </View>
 

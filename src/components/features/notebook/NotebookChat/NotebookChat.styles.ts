@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
   },
   header: {
     flexDirection: "row",
@@ -11,9 +12,9 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
     borderBottomWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: theme.colors.borderMuted,
   },
   headerButton: {
     padding: 8,
@@ -27,18 +28,18 @@ export const styles = StyleSheet.create({
   headerTitleText: {
     fontWeight: "bold",
     fontSize: 16,
-    color: "#111827",
+    color: theme.colors.textHeading,
     textAlign: "center",
   },
   headerSubtitleText: {
     fontSize: 10,
-    color: "#117864",
+    color: theme.colors.primary,
     fontWeight: "600",
     marginTop: 2,
   },
   chatWrapper: {
     flex: 1,
-    backgroundColor: "#f9fafb",
+    backgroundColor: theme.colors.gray50,
   },
   chatScroll: {
     flex: 1,
@@ -53,14 +54,14 @@ export const styles = StyleSheet.create({
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ffffff",
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: "#e0e6e6",
+    borderColor: theme.colors.border,
     borderRadius: 9999,
     paddingVertical: 4,
     paddingLeft: 8,
     paddingRight: 6,
-    shadowColor: "#117864",
+    shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -77,7 +78,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 12,
     fontSize: 14,
-    color: "#111827",
+    color: theme.colors.textHeading,
   },
   inputMicButton: {
     width: 36,
@@ -93,7 +94,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 18,
     elevation: 1,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
   },
   inputSendButtonPressed: {
     transform: [{ scale: 0.93 }],
@@ -106,37 +107,37 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     marginBottom: 12,
-    backgroundColor: "#f9fafb",
+    backgroundColor: theme.colors.gray50,
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: theme.colors.borderMuted,
   },
   citationMetaTitle: {
     fontSize: 12,
     fontWeight: "bold",
-    color: "#1f2937",
+    color: theme.colors.text,
   },
   citationMetaSubtitle: {
     fontSize: 10,
-    color: "#9ca3af",
+    color: theme.colors.textMuted,
     marginTop: 2,
   },
   citationContextCard: {
     padding: 16,
-    backgroundColor: "#ffffff",
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: theme.colors.borderMuted,
     borderRadius: 12,
   },
   citationContextText: {
     fontSize: 12,
     lineHeight: 18,
-    color: "#374151",
+    color: theme.colors.gray700,
   },
   highlightText: {
-    backgroundColor: "rgba(218, 247, 166, 0.4)",
-    color: "#131f00",
+    backgroundColor: theme.colors.highlightBg,
+    color: theme.colors.highlightText,
     fontWeight: "600",
     borderRadius: 4,
     paddingHorizontal: 2,
@@ -151,29 +152,29 @@ export const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: "center",
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
   },
   citationPrimaryButtonPressed: {
-    backgroundColor: "#005d4d",
+    backgroundColor: theme.colors.primaryDark,
   },
   citationPrimaryButtonText: {
     fontSize: 12,
     fontWeight: "bold",
-    color: "#ffffff",
+    color: theme.colors.textLight,
   },
   citationSecondaryButton: {
     paddingVertical: 12,
     paddingHorizontal: 24,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: theme.colors.gray100,
     borderRadius: 12,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: theme.colors.borderMuted,
   },
   citationSecondaryButtonText: {
     fontSize: 12,
     fontWeight: "bold",
-    color: "#4b5563",
+    color: theme.colors.gray500,
   },
   menuSheetContent: {
     paddingBottom: 24,
@@ -187,7 +188,7 @@ export const styles = StyleSheet.create({
     gap: 16,
   },
   menuItemPressed: {
-    backgroundColor: "#f3f4f6",
+    backgroundColor: theme.colors.gray100,
   },
   menuIconContainer: {
     width: 44,
@@ -203,7 +204,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(218, 247, 166, 0.3)",
   },
   menuIconInvite: {
-    backgroundColor: "#f3f4f6",
+    backgroundColor: theme.colors.gray100,
   },
   menuTextContainer: {
     flex: 1,
@@ -211,11 +212,11 @@ export const styles = StyleSheet.create({
   menuItemTitle: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#1f2937",
+    color: theme.colors.text,
   },
   menuItemSubtitle: {
     fontSize: 11,
-    color: "#9ca3af",
+    color: theme.colors.textMuted,
     marginTop: 2,
   },
 });

@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { useGlobalAudioPlayer } from "@/context/AudioPlayerContext";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -34,10 +35,10 @@ export function MiniPlayer() {
       <Ionicons
         name={isPlaying ? "headset-outline" : "pause-circle-outline"}
         size={28}
-        color="#ffffff"
+        color={theme.colors.textLight}
       />
       <Pressable onPress={dismiss} style={styles.closeBadge}>
-        <Ionicons name="close" size={14} color="#6e7a75" />
+        <Ionicons name="close" size={14} color={theme.colors.textSecondary} />
       </Pressable>
     </Pressable>
   );

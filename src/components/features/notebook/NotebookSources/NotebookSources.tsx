@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import Button from "@/components/Button";
 import { apiClient } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
@@ -130,7 +131,7 @@ export function NotebookSources() {
             { opacity: pressed ? 0.7 : 1 },
           ]}
         >
-          <Ionicons name="arrow-back" size={24} color="#117864" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
         </Pressable>
 
         <Text numberOfLines={1} style={styles.headerTitle}>
@@ -149,7 +150,7 @@ export function NotebookSources() {
             <Ionicons
               name="chatbubble-ellipses-outline"
               size={22}
-              color="#117864"
+              color={theme.colors.primary}
             />
           </Pressable>
           <Pressable
@@ -159,7 +160,7 @@ export function NotebookSources() {
               { opacity: pressed ? 0.7 : 1 },
             ]}
           >
-            <Ionicons name="person-add-outline" size={22} color="#117864" />
+            <Ionicons name="person-add-outline" size={22} color={theme.colors.primary} />
           </Pressable>
         </View>
       </View>
@@ -195,7 +196,7 @@ export function NotebookSources() {
             pressed && styles.addNewButtonPressed,
           ]}
         >
-          <Ionicons name="add" size={18} color="#005d4d" />
+          <Ionicons name="add" size={18} color={theme.colors.primaryDark} />
           <Text style={styles.addNewButtonText}>Add New Source</Text>
         </Pressable>
 
@@ -204,7 +205,7 @@ export function NotebookSources() {
           onPress={() => router.push(`/notebook/${id}` as any)}
           style={styles.chatButton}
         >
-          <Ionicons name="chatbubbles-outline" size={18} color="#ffffff" />
+          <Ionicons name="chatbubbles-outline" size={18} color={theme.colors.textLight} />
           <Text style={styles.chatButtonLabel}>Chat with Assistant</Text>
         </Button>
       </ScrollView>

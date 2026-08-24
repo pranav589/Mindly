@@ -1,13 +1,14 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   playerCard: {
-    backgroundColor: "#ffffff",
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: "#e0e6e6",
+    borderColor: theme.colors.border,
     borderRadius: 28,
     padding: 20,
-    shadowColor: "#117864",
+    shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
     shadowRadius: 15,
@@ -23,21 +24,21 @@ export const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 14,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
   podcastTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
   },
   podcastSubtitle: {
     fontSize: 12,
-    color: "#9ca3af",
+    color: theme.colors.textMuted,
   },
   immersivePlayer: {
-    backgroundColor: "#191c1d",
+    backgroundColor: theme.colors.immersiveBackground,
     borderRadius: 24,
     padding: 20,
     alignItems: "center",
@@ -75,7 +76,7 @@ export const styles = StyleSheet.create({
     borderRadius: 9999,
   },
   waveformBarActive: {
-    backgroundColor: "#9bf3da",
+    backgroundColor: theme.colors.primaryLight,
   },
   waveformBarInactive: {
     backgroundColor: "rgba(255, 255, 255, 0.15)",
@@ -91,7 +92,7 @@ export const styles = StyleSheet.create({
   },
   progressTimeText: {
     fontSize: 10,
-    color: "#9ca3af",
+    color: theme.colors.textMuted,
   },
   progressTrack: {
     height: 6,
@@ -104,7 +105,7 @@ export const styles = StyleSheet.create({
   progressFill: {
     height: "100%",
     borderRadius: 9999,
-    backgroundColor: "#9bf3da",
+    backgroundColor: theme.colors.primaryLight,
   },
   controlsRow: {
     width: "100%",
@@ -122,7 +123,7 @@ export const styles = StyleSheet.create({
   speedText: {
     fontSize: 12,
     fontWeight: "bold",
-    color: "#9bf3da",
+    color: theme.colors.primaryLight,
   },
   centralControls: {
     flexDirection: "row",
@@ -133,7 +134,7 @@ export const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },

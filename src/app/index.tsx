@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import React, { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { View, ActivityIndicator } from "react-native";
@@ -18,8 +19,8 @@ export default function Index() {
   }, [user, isLoading]);
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f8fafa" }}>
-      <ActivityIndicator size="large" color="#117864" />
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: theme.colors.background }}>
+      <ActivityIndicator size="large" color={theme.colors.primary} />
     </View>
   );
 }

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
+import { theme } from "@/theme/themes";
+
 interface ButtonProps {
   onPress: () => void;
   children: React.ReactNode;
@@ -68,37 +70,37 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   variantPrimary: {
-    backgroundColor: "#117864",
+    backgroundColor: theme.colors.primary,
   },
   variantSecondary: {
-    backgroundColor: "#a2d9ce",
+    backgroundColor: theme.colors.primaryLight,
   },
   variantOutline: {
     borderWidth: 1,
-    borderColor: "#117864",
+    borderColor: theme.colors.primary,
   },
   label: {
     fontWeight: "600",
     fontSize: 14,
   },
   labelPrimary: {
-    color: "#ffffff",
+    color: theme.colors.textLight,
   },
   labelSecondary: {
-    color: "#005d4d",
+    color: theme.colors.primaryDark,
   },
   labelOutline: {
-    color: "#117864",
+    color: theme.colors.primary,
   },
   primaryShadow: {
-    shadowColor: "#117864",
+    shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
     elevation: 4,
   },
   secondaryShadow: {
-    shadowColor: "#a2d9ce",
+    shadowColor: theme.colors.primaryLight,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,

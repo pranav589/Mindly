@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import ScreenHeader from "@/components/ScreenHeader/ScreenHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
@@ -146,7 +147,7 @@ export function QuizQuestionView({
                     <Ionicons
                       name="checkmark-circle"
                       size={18}
-                      color="#2e7d32"
+                      color={theme.colors.accentGreen}
                       style={styles.icon}
                     />
                   )}
@@ -156,7 +157,7 @@ export function QuizQuestionView({
                       <Ionicons
                         name="close-circle"
                         size={18}
-                        color="#c62828"
+                        color={theme.colors.textError}
                         style={styles.icon}
                       />
                     )}
@@ -174,7 +175,7 @@ export function QuizQuestionView({
                   isAnswered && !isCorrectShortAnswer && styles.incorrectCard,
                 ]}
                 placeholder="Type your answer here…"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={theme.colors.textMuted}
                 value={shortAnswer}
                 onChangeText={setShortAnswer}
                 editable={!isAnswered}
@@ -232,7 +233,7 @@ export function QuizQuestionView({
               disabled={isSubmitPending}
             >
               {isSubmitPending ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={theme.colors.textLight} />
               ) : (
                 <>
                   <Text style={styles.primaryButtonText}>
@@ -240,7 +241,7 @@ export function QuizQuestionView({
                       ? "Next Question"
                       : "Finish & Submit"}
                   </Text>
-                  <Ionicons name="arrow-forward" size={16} color="#fff" />
+                  <Ionicons name="arrow-forward" size={16} color={theme.colors.textLight} />
                 </>
               )}
             </Pressable>

@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { theme } from "@/theme/themes";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
   },
   header: {
     flexDirection: "row",
@@ -11,7 +12,7 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: "#f8fafa",
+    backgroundColor: theme.colors.background,
   },
   headerButton: {
     padding: 8,
@@ -21,7 +22,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     fontWeight: "bold",
     fontSize: 18,
-    color: "#117864",
+    color: theme.colors.primary,
     textAlign: "center",
     paddingHorizontal: 16,
   },
@@ -46,12 +47,12 @@ export const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
   },
   selectText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#117864",
+    color: theme.colors.primary,
   },
   sourcesList: {
     gap: 12,
@@ -76,13 +77,13 @@ export const styles = StyleSheet.create({
   addNewButtonText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#005d4d",
+    color: theme.colors.primaryDark,
   },
   chatButton: {
     marginTop: 16,
   },
   chatButtonLabel: {
-    color: "#ffffff",
+    color: theme.colors.textLight,
     fontWeight: "600",
     fontSize: 14,
   },

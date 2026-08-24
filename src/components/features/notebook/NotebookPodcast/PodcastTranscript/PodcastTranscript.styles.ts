@@ -1,3 +1,4 @@
+import { theme } from "@/theme/themes";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -8,7 +9,7 @@ export const styles = StyleSheet.create({
   topicsHeader: {
     fontSize: 12,
     fontWeight: "bold",
-    color: "#111827",
+    color: theme.colors.textHeading,
     marginBottom: 16,
     textTransform: "uppercase",
     letterSpacing: 1,
@@ -37,12 +38,12 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
   },
   avatarA: {
-    backgroundColor: "#e8f5f3",
-    borderColor: "#a2d9ce",
+    backgroundColor: theme.colors.primarySubtle,
+    borderColor: theme.colors.primaryLight,
   },
   avatarB: {
-    backgroundColor: "#fbf3e6",
-    borderColor: "#f5cba7",
+    backgroundColor: theme.colors.warningLight,
+    borderColor: theme.colors.warningBorder,
   },
   avatarText: {
     fontSize: 16,
@@ -54,7 +55,7 @@ export const styles = StyleSheet.create({
   speakerLabel: {
     fontSize: 11,
     fontWeight: "bold",
-    color: "#6b7280",
+    color: theme.colors.mutedGrayIcon,
     paddingHorizontal: 4,
   },
   bubble: {
@@ -63,18 +64,18 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
   },
   bubbleA: {
-    backgroundColor: "#ffffff",
-    borderColor: "#e0e6e6",
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.border,
     borderTopLeftRadius: 2,
   },
   bubbleB: {
-    backgroundColor: "#fef8f0",
-    borderColor: "#fadbd8",
+    backgroundColor: theme.colors.warningLight,
+    borderColor: theme.colors.errorLight,
     borderTopRightRadius: 2,
   },
   bubbleText: {
     fontSize: 14,
-    color: "#2c3e50",
+    color: theme.colors.grayTextMuted,
     lineHeight: 20,
   },
 });
