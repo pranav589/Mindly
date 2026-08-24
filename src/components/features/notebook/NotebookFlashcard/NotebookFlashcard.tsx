@@ -1,12 +1,20 @@
 import ScreenHeader from "@/components/ScreenHeader/ScreenHeader";
+import { useNotifications } from "@/context/NotificationContext";
 import { apiClient } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
-import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  AppState,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FlashcardItem } from "./FlashcardItem/FlashcardItem";
 import { styles } from "./NotebookFlashcard.styles";
@@ -17,8 +25,30 @@ export function NotebookFlashcard() {
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
 
+  const { sendLocalNotification } = useNotifications();
+  const isGeneratingRef = useRef(false);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+
+  // AppState change listener for background notifications
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: string) => {
+      if (nextAppState === "background" && isGeneratingRef.current && id) {
+        sendLocalNotification(
+          "Drafting Flashcards",
+          "Mindly is generating your active recall flashcards. We will notify you when they're ready!",
+          { notebookId: id, screen: "flashcard" },
+        );
+      }
+    };
+
+    const appStateSub = AppState.addEventListener(
+      "change",
+      handleAppStateChange,
+    );
+    return () => appStateSub.remove();
+  }, [id, sendLocalNotification]);
 
   const { data: cards = [], isLoading: isFetchingCards } = useQuery({
     queryKey: ["flashcards", id],
@@ -33,17 +63,33 @@ export function NotebookFlashcard() {
 
   const generateCardsMutation = useMutation({
     mutationFn: async () => {
+      isGeneratingRef.current = true;
       const res = await apiClient.post(`/api/flashcards/generate`, {
         notebookId: id,
       });
       return res.data;
     },
     onSuccess: () => {
+      isGeneratingRef.current = false;
+      sendLocalNotification(
+        "Flashcards Created! 🗂️",
+        "New active recall flashcards have been successfully added to your notebook.",
+        { notebookId: id, screen: "flashcard" },
+      );
       queryClient.invalidateQueries({ queryKey: ["flashcards", id] });
     },
-    onError: (err) => {
-      console.error(err);
-      Alert.alert("Error", "Failed to generate flashcards.");
+    onError: (err: any) => {
+      isGeneratingRef.current = false;
+      const backendError =
+        err.response?.data?.error ||
+        err.message ||
+        "Failed to generate study flashcards.";
+      sendLocalNotification("Flashcard Generation Failed ❌", backendError, {
+        notebookId: id,
+        screen: "flashcard",
+      });
+      console.error("Flashcard generation error:", backendError);
+      Alert.alert("Error", backendError);
     },
   });
 
@@ -95,7 +141,17 @@ export function NotebookFlashcard() {
       "This will generate a new set of flashcards from your sources. Continue?",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Regenerate", onPress: () => generateCardsMutation.mutate() },
+        {
+          text: "Regenerate",
+          onPress: () => {
+            generateCardsMutation.mutate();
+            router.replace(`/notebook/${id}` as any);
+            Alert.alert(
+              "Generating Flashcards",
+              "Your flashcards are being generated in the background. You'll receive a notification when they're ready!",
+            );
+          },
+        },
       ],
     );
   };
@@ -128,7 +184,14 @@ export function NotebookFlashcard() {
             Generate AI flashcards from your notebook sources.
           </Text>
           <Pressable
-            onPress={() => generateCardsMutation.mutate()}
+            onPress={() => {
+              generateCardsMutation.mutate();
+              router.replace(`/notebook/${id}` as any);
+              Alert.alert(
+                "Generating Flashcards",
+                "Your flashcards are being generated in the background. You'll receive a notification when they're ready!",
+              );
+            }}
             style={styles.primaryButton}
           >
             <Ionicons name="sparkles-outline" size={18} color="#fff" />

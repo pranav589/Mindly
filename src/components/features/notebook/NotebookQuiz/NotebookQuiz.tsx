@@ -1,10 +1,11 @@
+import { useNotifications } from "@/context/NotificationContext";
 import { apiClient } from "@/services/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
-import { ActivityIndicator, Alert, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Alert, AppState, Text, View } from "react-native";
 import { styles } from "./NotebookQuiz.styles";
 import { QuizHomeView } from "./QuizHomeView/QuizHomeView";
 import { QuizQuestionView } from "./QuizQuestionView/QuizQuestionView";
@@ -42,6 +43,9 @@ export function NotebookQuiz() {
   const { id } = useLocalSearchParams();
   const queryClient = useQueryClient();
 
+  const { sendLocalNotification } = useNotifications();
+  const isGeneratingRef = useRef(false);
+
   // Quiz state
   const [view, setView] = useState<"home" | "quiz" | "results">("home");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -50,6 +54,25 @@ export function NotebookQuiz() {
   const [isAnswered, setIsAnswered] = useState(false);
   const [userAnswers, setUserAnswers] = useState<any[]>([]);
   const [lastAttempt, setLastAttempt] = useState<Attempt | null>(null);
+
+  // Listen to AppState transitions for backgrounding notice
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: string) => {
+      if (nextAppState === "background" && isGeneratingRef.current && id) {
+        sendLocalNotification(
+          "Building Quiz Syllabus",
+          "Mindly is generating your study questions. We will notify you when it's ready!",
+          { notebookId: id, screen: "quiz" },
+        );
+      }
+    };
+
+    const appStateSub = AppState.addEventListener(
+      "change",
+      handleAppStateChange,
+    );
+    return () => appStateSub.remove();
+  }, [id, sendLocalNotification]);
 
   // ── API ──────────────────────────────────────────────────────────────────────
   const { data: quizzes = [], isLoading: isFetchingQuiz } = useQuery({
@@ -83,17 +106,31 @@ export function NotebookQuiz() {
 
   const generateQuizMutation = useMutation({
     mutationFn: async () => {
+      isGeneratingRef.current = true;
       const res = await apiClient.post(`/api/quizzes/generate`, {
         notebookId: id,
       });
       return res.data;
     },
     onSuccess: () => {
+      isGeneratingRef.current = false;
+      sendLocalNotification(
+        "Quiz Generated! 🧠",
+        "Your study questions are ready to test your knowledge.",
+        { notebookId: id, screen: "quiz" },
+      );
       queryClient.invalidateQueries({ queryKey: ["quizzes", id] });
     },
-    onError: (err) => {
-      console.error(err);
-      Alert.alert("Error", "Failed to generate quiz");
+    onError: (err: any) => {
+      isGeneratingRef.current = false;
+      const backendError = err.response?.data?.error || err.message || "Failed to generate study quiz.";
+      sendLocalNotification(
+        "Quiz Generation Failed ❌",
+        backendError,
+        { notebookId: id, screen: "quiz" },
+      );
+      console.error("Quiz generation error:", backendError);
+      Alert.alert("Error", backendError);
     },
   });
 
@@ -206,7 +243,14 @@ export function NotebookQuiz() {
         questions={questions}
         attempts={attempts}
         startQuiz={startQuiz}
-        onRegenerate={() => generateQuizMutation.mutate()}
+        onRegenerate={() => {
+          generateQuizMutation.mutate();
+          router.replace(`/notebook/${id}` as any);
+          Alert.alert(
+            "Generating Quiz",
+            "Your practice quiz is being generated in the background. You'll receive a notification when it's ready!"
+          );
+        }}
       />
     );
   }

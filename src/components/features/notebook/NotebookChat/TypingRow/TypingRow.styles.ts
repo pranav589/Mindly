@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   messageRow: {
-    marginBottom: 16,
+    marginBottom: 0,
     width: "100%",
   },
   aiMessageContainer: {

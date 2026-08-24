@@ -1,11 +1,10 @@
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
-import { SSEProvider } from "@/context/SSEContext";
 import { useAuth } from "@/hooks/useAuth";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function NotebookLayout() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+export default function ProtectedLayout() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -28,18 +27,11 @@ export default function NotebookLayout() {
   }
 
   return (
-    <SSEProvider notebookId={id as string}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f8fafa" }} edges={["bottom"]}>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="sources" />
-        <Stack.Screen name="studio" />
-        <Stack.Screen name="podcast" />
-        <Stack.Screen name="roadmap" />
-        <Stack.Screen name="mindmap" />
-        <Stack.Screen name="flashcard" />
-        <Stack.Screen name="quiz" />
-        <Stack.Screen name="quiz-history" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="notebook" />
       </Stack>
-    </SSEProvider>
+    </SafeAreaView>
   );
 }

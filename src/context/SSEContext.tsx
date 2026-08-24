@@ -1,8 +1,16 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from "react";
-import EventSource from "react-native-sse";
+import { useNotifications } from "@/context/NotificationContext";
 import { API_BASE_URL, getAuthToken } from "@/services/api";
-import { useQueryClient } from "@tanstack/react-query";
 import { SSEMessage } from "@/services/sse";
+import { useQueryClient } from "@tanstack/react-query";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { AppState } from "react-native";
+import EventSource from "react-native-sse";
 
 export type SSEStatus = "disconnected" | "connecting" | "connected";
 
@@ -29,16 +37,77 @@ const SSEContext = createContext<SSEContextType>({
   lastEvent: null,
 });
 
-export const SSEProvider: React.FC<{ notebookId: string; children: React.ReactNode }> = ({
-  notebookId,
-  children,
-}) => {
+// Helper to sanitize developer-facing errors for user notifications
+function cleanError(err: string): string {
+  if (!err) return "Something went wrong.";
+  const lower = err.toLowerCase();
+  if (lower.includes("qdrant") || lower.includes("apierror") || lower.includes("not found")) {
+    return "Could not connect to the database. Please try re-indexing again.";
+  }
+  if (lower.includes("compatibility") || lower.includes("server version")) {
+    return "Service version mismatch. Please try again.";
+  }
+  if (lower.includes("pdf") || lower.includes("extract") || lower.includes("parse")) {
+    return "Failed to parse document content. Please ensure the file is valid and readable.";
+  }
+  
+  // Strip out hex IDs, job IDs, URLs, and clean trailing colons
+  return err
+    .replace(/[a-f0-9]{24}/ig, "")
+    .replace(/job\s+\d+/ig, "")
+    .replace(/https?:\/\/\S+/g, "server")
+    .replace(/:\s*$/, "")
+    .trim() || "An error occurred during processing.";
+}
+
+export const SSEProvider: React.FC<{
+  notebookId: string;
+  children: React.ReactNode;
+}> = ({ notebookId, children }) => {
   const [status, setStatus] = useState<SSEStatus>("disconnected");
   const [streamingText, setStreamingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [lastEvent, setLastEvent] = useState<SSEEventWrapper | null>(null);
   const queryClient = useQueryClient();
   const esRef = useRef<EventSource<any> | null>(null);
+
+  const { sendLocalNotification } = useNotifications();
+  const activeJobs = useRef<Set<string>>(new Set());
+
+  // Listen to AppState transitions
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: string) => {
+      if (
+        nextAppState === "background" &&
+        activeJobs.current.size > 0 &&
+        notebookId
+      ) {
+        const runningJobNames = Array.from(activeJobs.current).map((job) => {
+          if (job === "sources") return "Source Indexing";
+          if (job === "podcast") return "AI Podcast Summary";
+          if (job === "roadmap") return "Syllabus Roadmap";
+          if (job === "mindmap") return "Interactive Mind Map";
+          return job;
+        });
+
+        // Determine destination screen for the notification tap
+        const primaryJob = Array.from(activeJobs.current)[0];
+        const targetScreen = primaryJob === "sources" ? "sources" : primaryJob;
+
+        sendLocalNotification(
+          "Processing Study Materials",
+          `Mindly is compiling: ${runningJobNames.join(", ")}. We will notify you when it's ready!`,
+          { notebookId, screen: targetScreen },
+        );
+      }
+    };
+
+    const appStateSub = AppState.addEventListener(
+      "change",
+      handleAppStateChange,
+    );
+    return () => appStateSub.remove();
+  }, [notebookId, sendLocalNotification]);
 
   useEffect(() => {
     if (!notebookId) return;
@@ -67,12 +136,14 @@ export const SSEProvider: React.FC<{ notebookId: string; children: React.ReactNo
     es.addEventListener("message", (event) => {
       try {
         if (!event.data) return;
-        const parsed = JSON.parse(event.data) as SSEMessage;
-        
+        const parsed = JSON.parse(event.data) as any;
+
         // Ignore keep-alive ping and initial connection events for state updates
         if (parsed.type === "ping" || parsed.type === "connected") return;
 
-        console.log(`⚡ [FRONTEND SSE] Received event: ${parsed.type} at: ${new Date().toISOString()}`);
+        console.log(
+          `⚡ [FRONTEND SSE] Received event: ${parsed.type} at: ${new Date().toISOString()}`,
+        );
         setLastEvent({ event: parsed, timestamp: Date.now() });
 
         switch (parsed.type) {
@@ -84,32 +155,128 @@ export const SSEProvider: React.FC<{ notebookId: string; children: React.ReactNo
           case "query:complete":
             setIsTyping(false);
             setStreamingText("");
-            // Invalidate message history query in the background silently
-            queryClient.invalidateQueries({ queryKey: ["messages", notebookId] });
+            queryClient.invalidateQueries({
+              queryKey: ["messages", notebookId],
+            });
             break;
 
           case "roadmap:progress":
-            // Invalidate/set progress indicator for roadmap
-            queryClient.setQueryData(["roadmap:progress", notebookId], parsed.message);
+            activeJobs.current.add("roadmap");
+            queryClient.setQueryData(
+              ["roadmap:progress", notebookId],
+              parsed.message,
+            );
             break;
 
           case "roadmap:complete":
-            queryClient.invalidateQueries({ queryKey: ["roadmap", notebookId] });
+            activeJobs.current.delete("roadmap");
+            sendLocalNotification(
+              "Roadmap Generated! 🗺️",
+              "Your personalized learning roadmap timeline is ready.",
+              { notebookId, screen: "roadmap" },
+            );
+            queryClient.invalidateQueries({
+              queryKey: ["roadmap", notebookId],
+            });
+            break;
+
+          case "roadmap:failed":
+            activeJobs.current.delete("roadmap");
+            sendLocalNotification(
+              "Roadmap Generation Failed ❌",
+              cleanError(parsed.error) || "Failed to generate roadmap syllabus",
+              { notebookId, screen: "roadmap" },
+            );
+            break;
+
+          case "podcast:progress":
+            activeJobs.current.add("podcast");
             break;
 
           case "podcast:complete":
-            queryClient.invalidateQueries({ queryKey: ["podcast", notebookId] });
+            activeJobs.current.delete("podcast");
+            sendLocalNotification(
+              "Podcast Synthesized! 🎙️",
+              "Your AI host overview discussion audio is ready to stream.",
+              { notebookId, screen: "podcast" },
+            );
+            queryClient.invalidateQueries({
+              queryKey: ["podcast", notebookId],
+            });
+            break;
+
+          case "podcast:failed":
+            activeJobs.current.delete("podcast");
+            sendLocalNotification(
+              "Podcast Synthesis Failed ❌",
+              cleanError(parsed.error) || "Failed to generate podcast audio discussion",
+              { notebookId, screen: "podcast" },
+            );
+            break;
+
+          case "mindmap:progress":
+            activeJobs.current.add("mindmap");
             break;
 
           case "mindmap:complete":
-            queryClient.invalidateQueries({ queryKey: ["mindmap", notebookId] });
+            activeJobs.current.delete("mindmap");
+            sendLocalNotification(
+              "Mind Map Created! 🧠",
+              "Your interactive concept mind map is ready to explore.",
+              { notebookId, screen: "mindmap" },
+            );
+            queryClient.invalidateQueries({
+              queryKey: ["mindmap", notebookId],
+            });
+            break;
+
+          case "mindmap:failed":
+            activeJobs.current.delete("mindmap");
+            sendLocalNotification(
+              "Mind Map Generation Failed ❌",
+              cleanError(parsed.error) || "Failed to compile concept map",
+              { notebookId, screen: "mindmap" },
+            );
             break;
 
           case "indexing:start":
+            activeJobs.current.add("sources");
+            queryClient.invalidateQueries({
+              queryKey: ["sources", notebookId],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ["notebook", notebookId],
+            });
+            break;
+
           case "indexing:complete":
+            activeJobs.current.delete("sources");
+            sendLocalNotification(
+              "Source Indexed! 📄",
+              `"${parsed.sourceName || "Your document"}" has been successfully synced and is ready to study.`,
+              { notebookId, screen: "sources" },
+            );
+            queryClient.invalidateQueries({
+              queryKey: ["sources", notebookId],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ["notebook", notebookId],
+            });
+            break;
+
           case "indexing:failed":
-            queryClient.invalidateQueries({ queryKey: ["sources", notebookId] });
-            queryClient.invalidateQueries({ queryKey: ["notebook", notebookId] });
+            activeJobs.current.delete("sources");
+            sendLocalNotification(
+              "Ingestion Failed ❌",
+              `Failed to index "${parsed.sourceName || "your document"}": ${cleanError(parsed.error)}.`,
+              { notebookId, screen: "sources" },
+            );
+            queryClient.invalidateQueries({
+              queryKey: ["sources", notebookId],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ["notebook", notebookId],
+            });
             break;
         }
       } catch (err) {
@@ -118,7 +285,10 @@ export const SSEProvider: React.FC<{ notebookId: string; children: React.ReactNo
     });
 
     es.addEventListener("error", (event: any) => {
-      console.error("SSE Connection error:", event.message || event.detail || event);
+      console.error(
+        "SSE Connection error:",
+        event.message || event.detail || event,
+      );
       setStatus("disconnected");
     });
 
@@ -127,10 +297,19 @@ export const SSEProvider: React.FC<{ notebookId: string; children: React.ReactNo
       esRef.current = null;
       setStatus("disconnected");
     };
-  }, [notebookId, queryClient]);
+  }, [notebookId, queryClient, sendLocalNotification]);
 
   return (
-    <SSEContext.Provider value={{ status, streamingText, isTyping, setStreamingText, setIsTyping, lastEvent }}>
+    <SSEContext.Provider
+      value={{
+        status,
+        streamingText,
+        isTyping,
+        setStreamingText,
+        setIsTyping,
+        lastEvent,
+      }}
+    >
       {children}
     </SSEContext.Provider>
   );

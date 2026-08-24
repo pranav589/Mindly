@@ -59,18 +59,51 @@ export function NotebookSources() {
     },
   });
 
-  const handleDeleteSource = (source: any) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
+  // Re-index Source Mutation
+  const reindexSourceMutation = useMutation({
+    mutationFn: async (sourceId: string) => {
+      await apiClient.post(`/api/notebooks/${id}/sources/${sourceId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sources", id] });
+      queryClient.invalidateQueries({ queryKey: ["notebook", id] });
+      Alert.alert("Success", "Source queued for re-indexing!");
+    },
+    onError: (err: any) => {
+      console.error(err);
+      Alert.alert("Error", err.response?.data?.error || "Failed to re-index source");
+    },
+  });
+
+  const handleSourceActions = (source: any) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
 
     Alert.alert(
-      "Delete Source",
-      `Are you sure you want to delete ${source.name}?`,
+      "Source Actions",
+      `Choose an action for "${source.name}"`,
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Delete",
+          text: "Re-index (Sync to Vector DB)",
+          onPress: () => reindexSourceMutation.mutate(source._id),
+        },
+        {
+          text: "Delete Source",
           style: "destructive",
-          onPress: () => deleteSourceMutation.mutate(source._id),
+          onPress: () => {
+            Alert.alert(
+              "Confirm Delete",
+              `Are you sure you want to delete "${source.name}"? This cannot be undone.`,
+              [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Delete",
+                  style: "destructive",
+                  onPress: () => deleteSourceMutation.mutate(source._id),
+                },
+              ]
+            );
+          },
         },
       ],
     );
@@ -149,7 +182,7 @@ export function NotebookSources() {
             <SourceCard
               key={source._id}
               source={source}
-              onLongPress={handleDeleteSource}
+              onLongPress={handleSourceActions}
             />
           ))}
         </View>

@@ -63,7 +63,7 @@ export function NotebookPodcast() {
       queryClient.invalidateQueries({ queryKey: ["notebook", id] });
     },
     onError: (err: any) => {
-      console.error(err);
+      console.warn("Podcast generation error:", err?.response?.data?.error || err.message);
       Alert.alert(
         "Error",
         err?.response?.data?.error ?? "Failed to initiate podcast generation.",
@@ -83,7 +83,14 @@ export function NotebookPodcast() {
         { text: "Cancel", style: "cancel" },
         {
           text: "Regenerate",
-          onPress: () => generatePodcastMutation.mutate(),
+          onPress: () => {
+            generatePodcastMutation.mutate();
+            router.replace(`/notebook/${id}` as any);
+            Alert.alert(
+              "Generating Podcast",
+              "Your AI podcast discussion is being generated in the background. You'll receive a notification when it's ready!"
+            );
+          },
         },
       ],
     );
@@ -128,7 +135,14 @@ export function NotebookPodcast() {
             materials in this notebook.
           </Text>
           <Pressable
-            onPress={() => generatePodcastMutation.mutate()}
+            onPress={() => {
+              generatePodcastMutation.mutate();
+              router.replace(`/notebook/${id}` as any);
+              Alert.alert(
+                "Generating Podcast",
+                "Your AI podcast discussion is being generated in the background. You'll receive a notification when it's ready!"
+              );
+            }}
             style={styles.primaryButton}
           >
             <Ionicons name="sparkles-outline" size={18} color="#fff" />

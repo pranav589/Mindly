@@ -84,7 +84,7 @@ export default function BottomSheet({
             backgroundStyle={styles.background}
             handleIndicatorStyle={styles.handleIndicator}
             style={{
-              marginTop: "10%",
+              marginTop: "5%",
             }}
           >
             <BottomSheetScrollView

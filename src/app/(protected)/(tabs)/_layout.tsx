@@ -1,28 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs, useRouter } from "expo-router";
-import React, { useEffect } from "react";
-import { Platform, View, ActivityIndicator, StyleSheet } from "react-native";
+import { Tabs } from "expo-router";
+import React from "react";
+import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAuth } from "@/hooks/useAuth";
 
 const TabsLayout = () => {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace("/auth");
-    }
-  }, [isAuthenticated, isLoading]);
-
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#117864" />
-      </View>
-    );
-  }
   return (
     <View style={styles.container}>
       <Tabs
@@ -32,7 +15,7 @@ const TabsLayout = () => {
           tabBarHideOnKeyboard: true,
           tabBarStyle: {
             position: "absolute",
-            bottom: insets.bottom + 10,
+            bottom: 10,
             backgroundColor: "#ffffff",
             marginHorizontal: "10%",
             borderRadius: 48,

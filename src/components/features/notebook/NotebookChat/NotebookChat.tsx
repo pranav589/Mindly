@@ -200,7 +200,7 @@ export function NotebookChat() {
       {/* TOP HEADER */}
       <View style={styles.header}>
         <Pressable
-          onPress={() => router.replace("/(tabs)")}
+          onPress={() => router.replace("/(tabs)" as any)}
           style={({ pressed }) => [
             styles.headerButton,
             { opacity: pressed ? 0.7 : 1 },
@@ -254,7 +254,7 @@ export function NotebookChat() {
           style={[
             styles.inputPanel,
             {
-              paddingBottom: isKeyboardVisible ? 12 : insets.bottom,
+              paddingBottom: isKeyboardVisible ? 12 : 10,
             },
           ]}
         >

@@ -78,7 +78,7 @@ export function NotebookRoadmap() {
       queryClient.invalidateQueries({ queryKey: ["notebook", id] });
     },
     onError: (err: any) => {
-      console.error(err);
+      console.warn("Roadmap generation error:", err?.response?.data?.error || err.message);
       Alert.alert(
         "Error",
         err?.response?.data?.error ?? "Failed to initiate roadmap generation.",
@@ -98,7 +98,14 @@ export function NotebookRoadmap() {
         { text: "Cancel", style: "cancel" },
         {
           text: "Regenerate",
-          onPress: () => generateRoadmapMutation.mutate(),
+          onPress: () => {
+            generateRoadmapMutation.mutate();
+            router.replace(`/notebook/${id}` as any);
+            Alert.alert(
+              "Generating Roadmap",
+              "Your personalized syllabus roadmap is being generated in the background. You'll receive a notification when it's ready!"
+            );
+          },
         },
       ],
     );
@@ -153,7 +160,14 @@ export function NotebookRoadmap() {
             your uploaded notebook sources.
           </Text>
           <Pressable
-            onPress={() => generateRoadmapMutation.mutate()}
+            onPress={() => {
+              generateRoadmapMutation.mutate();
+              router.replace(`/notebook/${id}` as any);
+              Alert.alert(
+                "Generating Roadmap",
+                "Your personalized syllabus roadmap is being generated in the background. You'll receive a notification when it's ready!"
+              );
+            }}
             style={styles.primaryButton}
           >
             <Ionicons name="sparkles-outline" size={18} color="#fff" />

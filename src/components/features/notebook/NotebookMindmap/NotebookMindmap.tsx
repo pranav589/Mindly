@@ -99,7 +99,7 @@ export function NotebookMindmap() {
       queryClient.invalidateQueries({ queryKey: ["notebook", id] });
     },
     onError: (err: any) => {
-      console.error(err);
+      console.warn("Mindmap generation error:", err?.response?.data?.error || err.message);
       Alert.alert(
         "Error",
         err?.response?.data?.error ?? "Failed to initiate mind map generation.",
@@ -171,7 +171,14 @@ export function NotebookMindmap() {
             automatically from your notebook sources.
           </Text>
           <Pressable
-            onPress={() => generateMindmapMutation.mutate()}
+            onPress={() => {
+              generateMindmapMutation.mutate();
+              router.replace(`/notebook/${id}` as any);
+              Alert.alert(
+                "Generating Mind Map",
+                "Your interactive mind map is being generated in the background. You'll receive a notification when it's ready!"
+              );
+            }}
             style={styles.primaryButton}
           >
             <Ionicons name="sparkles-outline" size={18} color="#fff" />
@@ -203,7 +210,14 @@ export function NotebookMindmap() {
                 { text: "Cancel", style: "cancel" },
                 {
                   text: "Regenerate",
-                  onPress: () => generateMindmapMutation.mutate(),
+                  onPress: () => {
+                    generateMindmapMutation.mutate();
+                    router.replace(`/notebook/${id}` as any);
+                    Alert.alert(
+                      "Generating Mind Map",
+                      "Your interactive mind map is being generated in the background. You'll receive a notification when it's ready!"
+                    );
+                  },
                 },
               ],
             );

@@ -11,7 +11,7 @@ export default function Index() {
     if (isLoading) return;
 
     if (user) {
-      router.replace("/(tabs)");
+      router.replace("/(tabs)" as any);
     } else {
       router.replace("/onboarding");
     }

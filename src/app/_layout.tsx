@@ -6,7 +6,10 @@ import { ActivityIndicator, View } from "react-native";
 import { loadStoredTokens } from "@/services/api";
 import { AuthProvider } from "@/context/AuthContext";
 import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
+import { NotificationProvider } from "@/context/NotificationContext";
 import { MiniPlayer } from "@/components/MiniPlayer/MiniPlayer";
+
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const queryClient = new QueryClient();
 
@@ -28,21 +31,24 @@ export default function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AudioPlayerProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="onboarding" />
-              <Stack.Screen name="auth" />
-              <Stack.Screen name="(tabs)" />
-            </Stack>
-            <MiniPlayer />
-          </GestureHandlerRootView>
-        </AudioPlayerProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <SafeAreaProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <AudioPlayerProvider>
+            <NotificationProvider>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="index" />
+                  <Stack.Screen name="(auth)" />
+                  <Stack.Screen name="(protected)" />
+                </Stack>
+                <MiniPlayer />
+              </GestureHandlerRootView>
+            </NotificationProvider>
+          </AudioPlayerProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </SafeAreaProvider>
   );
 }
 
