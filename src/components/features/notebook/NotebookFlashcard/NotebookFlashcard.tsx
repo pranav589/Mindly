@@ -20,6 +20,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FlashcardItem } from "./FlashcardItem/FlashcardItem";
 import { styles } from "./NotebookFlashcard.styles";
 
+import { offlineCache } from "@/services/offlineCache";
+
 export function NotebookFlashcard() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
@@ -36,18 +38,50 @@ export function NotebookFlashcard() {
   const { data: notebook } = useQuery({
     queryKey: ["notebook", id],
     queryFn: async () => {
-      const res = await apiClient.get<{ notebook: any }>(`/api/notebooks/${id}`);
-      return res.data.notebook;
+      try {
+        const res = await apiClient.get<{ notebook: any }>(`/api/notebooks/${id}`);
+        const nb = res.data.notebook;
+        if (id && nb) {
+          await offlineCache.cacheNotebook(id as string, nb.name || "Notebook");
+        }
+        return nb;
+      } catch (err) {
+        if (id) {
+          const cachedList = await offlineCache.getCachedNotebooks();
+          const match = cachedList.find(n => n.notebookId === id);
+          if (match) {
+            return { id: match.notebookId, name: match.title };
+          }
+        }
+        throw err;
+      }
     },
     enabled: !!id,
   });
   const { data: cards = [], isLoading: isFetchingCards } = useQuery({
     queryKey: ["flashcards", id],
     queryFn: async () => {
-      const res = await apiClient.get<any[]>(`/api/flashcards`, {
-        params: { notebookId: id },
-      });
-      return res.data;
+      try {
+        const res = await apiClient.get<any[]>(`/api/flashcards`, {
+          params: { notebookId: id },
+        });
+        if (id) {
+          await offlineCache.cacheFlashcards(id as string, res.data);
+        }
+        return res.data;
+      } catch (err) {
+        if (id) {
+          const cached = await offlineCache.getCachedFlashcards(id as string);
+          if (cached && cached.length > 0) {
+            return cached.map(c => ({
+              ...c,
+              _id: c.id,
+              nextReview: c.dueDate ? c.dueDate.toISOString() : null,
+            }));
+          }
+        }
+        throw err;
+      }
     },
     enabled: !!id,
   });
@@ -57,8 +91,9 @@ export function NotebookFlashcard() {
     const now = Date.now();
     let earliest = null;
     for (const card of flashcards) {
-      if (card.nextReview) {
-        const reviewTime = new Date(card.nextReview).getTime();
+      const nextReviewVal = card.nextReview || card.dueDate;
+      if (nextReviewVal) {
+        const reviewTime = new Date(nextReviewVal).getTime();
         if (!isNaN(reviewTime) && reviewTime > now) {
           if (!earliest || reviewTime < earliest) {
             earliest = reviewTime;
@@ -136,9 +171,54 @@ export function NotebookFlashcard() {
 
   const reviewCardMutation = useMutation({
     mutationFn: async (payload: { cardId: string; rating: number }) => {
-      await apiClient.post(`/api/flashcards/${payload.cardId}/review`, {
-        rating: payload.rating,
-      });
+      try {
+        await apiClient.post(`/api/flashcards/${payload.cardId}/review`, {
+          rating: payload.rating,
+        });
+      } catch (err) {
+        console.warn("[Flashcard] Offline review. Running SM2 local calculation...");
+        const currentCard = cards.find((c) => c._id === payload.cardId || c.id === payload.cardId);
+        if (currentCard) {
+          let interval = currentCard.interval || 0;
+          let ease = currentCard.ease || 2.5;
+          let repetitions = currentCard.repetitions || 0;
+          let dueDate = new Date();
+
+          const rating = payload.rating;
+          let q = 3;
+          if (rating === 1) q = 1;
+          else if (rating === 2) q = 3;
+          else if (rating === 3) q = 4;
+          else if (rating === 4) q = 5;
+
+          if (q >= 3) {
+            if (repetitions === 0) {
+              interval = 1;
+            } else if (repetitions === 1) {
+              interval = 6;
+            } else {
+              interval = Math.round(interval * ease);
+            }
+            repetitions += 1;
+          } else {
+            repetitions = 0;
+            interval = 1;
+          }
+
+          ease = ease + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+          if (ease < 1.3) ease = 1.3;
+
+          dueDate = new Date(Date.now() + interval * 24 * 60 * 60 * 1000);
+
+          await offlineCache.updateFlashcardSM2(
+            payload.cardId,
+            interval,
+            ease,
+            repetitions,
+            dueDate
+          );
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["flashcards", id] });

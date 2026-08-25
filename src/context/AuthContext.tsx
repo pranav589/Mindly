@@ -43,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const response = await apiClient.get<{ user: User }>("/api/auth/me");
         return response.data.user;
       } catch (err) {
+        console.error("[AuthContext] authMe query failed:", err);
         return null;
       }
     },
@@ -53,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoggingIn(true);
     try {
       const authUrl = getGoogleAuthUrl();
-      const redirectUrl = Linking.createURL("");
+      const redirectUrl = Linking.createURL("redirect");
 
       const result = await WebBrowser.openAuthSessionAsync(
         authUrl,

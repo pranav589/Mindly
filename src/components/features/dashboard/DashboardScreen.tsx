@@ -1,4 +1,8 @@
+import BottomSheet from "@/components/BottomSheet";
+import { apiClient } from "@/services/api";
+import { offlineCache } from "@/services/offlineCache";
 import { theme } from "@/theme/themes";
+import { formatDate } from "@/utils/dates";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
@@ -17,8 +21,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import BottomSheet from "@/components/BottomSheet";
-import { apiClient } from "@/services/api";
 import { getStyles } from "./DashboardScreen.styles";
 
 export default function DashboardScreen() {
@@ -31,14 +33,40 @@ export default function DashboardScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [newNotebookName, setNewNotebookName] = useState("");
+  const [cachedNotebookIds, setCachedNotebookIds] = useState<Set<string>>(
+    new Set(),
+  );
 
   const { data: notebooks = [] } = useQuery({
     queryKey: ["notebooks"],
     queryFn: async () => {
-      const response = await apiClient.get<any[]>("/api/notebooks");
-      return response.data;
+      try {
+        const response = await apiClient.get<any[]>("/api/notebooks");
+        const list = response.data;
+        for (const nb of list) {
+          await offlineCache.cacheNotebook(nb._id, nb.name || "Notebook");
+        }
+        return list;
+      } catch (err) {
+        const cached = await offlineCache.getCachedNotebooks();
+        if (cached && cached.length > 0) {
+          return cached.map((c) => ({
+            _id: c.notebookId,
+            name: c.title,
+            isOfflineOnly: true,
+          }));
+        }
+        throw err;
+      }
     },
   });
+
+  React.useEffect(() => {
+    offlineCache.getCachedNotebooks().then((list) => {
+      const ids = new Set(list.map((n) => n.notebookId));
+      setCachedNotebookIds(ids);
+    });
+  }, [notebooks]);
 
   const createNotebookMutation = useMutation({
     mutationFn: async (name: string) => {
@@ -87,7 +115,11 @@ export default function DashboardScreen() {
             <Text style={styles.workspaceText}>Workspace</Text>
             <Pressable style={styles.workspaceSelector}>
               <Text style={styles.workspaceType}>Personal</Text>
-              <Ionicons name="chevron-down" size={14} color={theme.colors.textSecondary} />
+              <Ionicons
+                name="chevron-down"
+                size={14}
+                color={theme.colors.textSecondary}
+              />
             </Pressable>
           </View>
         </View>
@@ -98,7 +130,11 @@ export default function DashboardScreen() {
             { opacity: pressed ? 0.7 : 1 },
           ]}
         >
-          <Ionicons name="search-outline" size={22} color={theme.colors.primaryDark} />
+          <Ionicons
+            name="search-outline"
+            size={22}
+            color={theme.colors.primaryDark}
+          />
         </Pressable>
       </View>
 
@@ -123,7 +159,11 @@ export default function DashboardScreen() {
             placeholderTextColor={theme.colors.placeholder}
           />
           <Pressable style={styles.micButton}>
-            <Ionicons name="mic-outline" size={20} color={theme.colors.textSecondary} />
+            <Ionicons
+              name="mic-outline"
+              size={20}
+              color={theme.colors.textSecondary}
+            />
           </Pressable>
         </View>
 
@@ -136,7 +176,11 @@ export default function DashboardScreen() {
               { opacity: pressed ? 0.7 : 1 },
             ]}
           >
-            <Ionicons name="filter-outline" size={20} color={theme.colors.textSecondary} />
+            <Ionicons
+              name="filter-outline"
+              size={20}
+              color={theme.colors.textSecondary}
+            />
           </Pressable>
         </View>
 
@@ -161,7 +205,9 @@ export default function DashboardScreen() {
                     name={(notebook.icon || "book") as any}
                     size={20}
                     color={
-                      notebook.theme === "tertiary" ? theme.colors.onboardingTertiary : theme.colors.primaryDark
+                      notebook.theme === "tertiary"
+                        ? theme.colors.onboardingTertiary
+                        : theme.colors.primaryDark
                     }
                   />
                 </View>
@@ -170,6 +216,29 @@ export default function DashboardScreen() {
                 <Text numberOfLines={2} style={styles.notebookTitle}>
                   {notebook.name}
                 </Text>
+
+                <View style={styles.noteBookMetaData}>
+                  <View style={styles.metaItem}>
+                    <Ionicons
+                      name="time-outline"
+                      size={12}
+                      color={theme.colors.textSecondary}
+                    />
+                    <Text style={styles.metaText}>
+                      {formatDate(notebook.createdAt)}
+                    </Text>
+                  </View>
+                  <View style={styles.metaItem}>
+                    <Ionicons
+                      name="document-text-outline"
+                      size={12}
+                      color={theme.colors.textSecondary}
+                    />
+                    <Text style={styles.metaText}>
+                      {notebook.sourcesCount || 0}
+                    </Text>
+                  </View>
+                </View>
               </Pressable>
             );
           })}
@@ -183,7 +252,11 @@ export default function DashboardScreen() {
             ]}
           >
             <View style={styles.addNotebookIconContainer}>
-              <Ionicons name="add" size={24} color={theme.colors.textSecondary} />
+              <Ionicons
+                name="add"
+                size={24}
+                color={theme.colors.textSecondary}
+              />
             </View>
             <Text style={styles.addNotebookText}>Blank Notebook</Text>
           </Pressable>
@@ -213,7 +286,11 @@ export default function DashboardScreen() {
               styles.drawerItemIconContainerPrimary,
             ]}
           >
-            <Ionicons name="document-text-outline" size={20} color={theme.colors.primary} />
+            <Ionicons
+              name="document-text-outline"
+              size={20}
+              color={theme.colors.primary}
+            />
           </View>
           <Text style={styles.drawerItemText}>New Blank Notebook</Text>
         </Pressable>
@@ -229,7 +306,11 @@ export default function DashboardScreen() {
           ]}
         >
           <View style={styles.drawerItemIconContainer}>
-            <Ionicons name="cloud-upload-outline" size={20} color={theme.colors.textSecondary} />
+            <Ionicons
+              name="cloud-upload-outline"
+              size={20}
+              color={theme.colors.textSecondary}
+            />
           </View>
           <Text style={styles.drawerItemText}>Import from Drive</Text>
         </Pressable>
@@ -245,7 +326,11 @@ export default function DashboardScreen() {
           ]}
         >
           <View style={styles.drawerItemIconContainer}>
-            <Ionicons name="scan-outline" size={20} color={theme.colors.textSecondary} />
+            <Ionicons
+              name="scan-outline"
+              size={20}
+              color={theme.colors.textSecondary}
+            />
           </View>
           <Text style={styles.drawerItemText}>Scan Document</Text>
         </Pressable>
@@ -261,7 +346,11 @@ export default function DashboardScreen() {
           ]}
         >
           <View style={styles.drawerItemIconContainer}>
-            <Ionicons name="share-social-outline" size={20} color={theme.colors.textSecondary} />
+            <Ionicons
+              name="share-social-outline"
+              size={20}
+              color={theme.colors.textSecondary}
+            />
           </View>
           <Text style={styles.drawerItemText}>Share Workspace</Text>
         </Pressable>

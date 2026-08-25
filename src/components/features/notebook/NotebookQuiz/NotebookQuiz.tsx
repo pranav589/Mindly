@@ -12,6 +12,8 @@ import { QuizHomeView } from "./QuizHomeView/QuizHomeView";
 import { QuizQuestionView } from "./QuizQuestionView/QuizQuestionView";
 import { QuizResultsView } from "./QuizResultsView/QuizResultsView";
 
+import { offlineCache } from "@/services/offlineCache";
+
 // ── Types ──────────────────────────────────────────────────────────────────────
 type QuestionType = "mcq" | "true_false" | "short_answer";
 
@@ -79,10 +81,35 @@ export function NotebookQuiz() {
   const { data: quizzes = [], isLoading: isFetchingQuiz } = useQuery({
     queryKey: ["quizzes", id],
     queryFn: async () => {
-      const res = await apiClient.get<any[]>(`/api/quizzes`, {
-        params: { notebookId: id },
-      });
-      return res.data;
+      try {
+        const res = await apiClient.get<any[]>(`/api/quizzes`, {
+          params: { notebookId: id },
+        });
+        if (id && res.data && res.data.length > 0) {
+          // Cache the actual questions array of the active quiz
+          const activeQ = res.data[0];
+          await offlineCache.cacheQuizzes(id as string, activeQ.questions || []);
+        }
+        return res.data;
+      } catch (err) {
+        if (id) {
+          const cachedQuestions = await offlineCache.getCachedQuizzes(id as string);
+          if (cachedQuestions && cachedQuestions.length > 0) {
+            return [{
+              _id: `offline_quiz_${id}`,
+              questions: cachedQuestions.map((q: any) => ({
+                id: q.id,
+                type: "mcq",
+                questionText: q.question,
+                options: q.options,
+                correctAnswer: q.correctAnswer,
+                explanation: q.explanation || "",
+              })),
+            }];
+          }
+        }
+        throw err;
+      }
     },
     enabled: !!id,
   });

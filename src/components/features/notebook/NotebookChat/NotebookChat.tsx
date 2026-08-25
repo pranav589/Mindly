@@ -11,6 +11,7 @@ import {
   useAudioRecorder,
 } from "expo-audio";
 import * as Haptics from "expo-haptics";
+import { useNetworkState } from "expo-network";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -38,6 +39,9 @@ export function NotebookChat() {
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
 
+  const networkState = useNetworkState();
+  const isOffline = networkState.isConnected === false;
+
   const [messageText, setMessageText] = useState("");
   const { isTyping, setIsTyping, streamingText, setStreamingText, lastEvent } =
     useSSE();
@@ -48,7 +52,7 @@ export function NotebookChat() {
   const startTimeRef = useRef<number>(0);
 
   const toggleRecording = async () => {
-    if (isBusyRef.current) return;
+    if (isBusyRef.current || isOffline) return;
     isBusyRef.current = true;
 
     try {
@@ -415,8 +419,13 @@ export function NotebookChat() {
             <TextInput
               value={messageText}
               onChangeText={setMessageText}
-              placeholder="Ask about this document..."
-              style={styles.textInput}
+              placeholder={
+                isOffline
+                  ? "Chat is disabled offline"
+                  : "Ask about this document..."
+              }
+              editable={!isOffline}
+              style={[styles.textInput, isOffline && { opacity: 0.5 }]}
               placeholderTextColor={theme.colors.placeholder}
               onSubmitEditing={handleSend}
               returnKeyType="send"
@@ -425,14 +434,14 @@ export function NotebookChat() {
             {messageText.trim() === "" ? (
               <Pressable
                 onPress={toggleRecording}
-                disabled={isTyping}
+                disabled={isTyping || isOffline}
                 style={({ pressed }) => [
                   styles.inputMicButton,
                   (pressed || isRecording) && {
                     backgroundColor: "rgba(17, 120, 100, 0.15)",
                     borderRadius: 18,
                   },
-                  isTyping && { opacity: 0.4 },
+                  (isTyping || isOffline) && { opacity: 0.4 },
                 ]}
               >
                 <Ionicons
@@ -448,9 +457,11 @@ export function NotebookChat() {
             ) : (
               <Pressable
                 onPress={handleSend}
+                disabled={isOffline}
                 style={({ pressed }) => [
                   styles.inputSendButton,
-                  pressed && styles.inputSendButtonPressed,
+                  pressed && !isOffline && styles.inputSendButtonPressed,
+                  isOffline && { opacity: 0.4 },
                 ]}
               >
                 <Ionicons

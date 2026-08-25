@@ -46,3 +46,10 @@ app-example
 
 # backend symlink/folder
 /backend
+
+# SQLite Databases
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+sqlite.db

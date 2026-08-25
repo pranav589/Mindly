@@ -53,6 +53,7 @@ export const getRefreshToken = () => refreshToken;
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 10000, // 10 seconds timeout to prevent indefinite hangs
   withCredentials: true, // Crucial for HTTPOnly cookie-based authentication
   headers: {
     "Content-Type": "application/json",

@@ -7,7 +7,7 @@ import { API_BASE_URL } from "./api";
  * control back to the app after the browser OAuth flow completes.
  */
 export const getGoogleRedirectUri = (): string => {
-  return Linking.createURL("");
+  return Linking.createURL("redirect");
 };
 
 /**

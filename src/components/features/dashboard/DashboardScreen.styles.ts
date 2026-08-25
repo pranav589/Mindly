@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
 import { theme } from "@/theme/themes";
+import { StyleSheet } from "react-native";
 
 export const getStyles = (insets: { top: number; bottom: number }) =>
   StyleSheet.create({
@@ -121,6 +121,25 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
     notebookCardPressed: {
       transform: [{ scale: 0.96 }],
     },
+    noteBookMetaData: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: "auto",
+      paddingTop: 8,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.gray100,
+    },
+    metaItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 3,
+    },
+    metaText: {
+      fontSize: 11,
+      color: theme.colors.textSecondary,
+      fontWeight: "500",
+    },
     notebookIconContainer: {
       width: 40,
       height: 40,
@@ -136,16 +155,6 @@ export const getStyles = (insets: { top: number; bottom: number }) =>
       lineHeight: 20,
       marginBottom: 8,
       height: 40,
-    },
-    notebookMeta: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginTop: "auto",
-    },
-    notebookMetaText: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-      marginLeft: 4,
     },
     addNotebookCard: {
       width: "48%",

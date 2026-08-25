@@ -40,6 +40,8 @@ interface NotebookData {
   roadmapStatus?: "idle" | "generating";
 }
 
+import { offlineCache } from "@/services/offlineCache";
+
 export function NotebookRoadmap() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
@@ -54,10 +56,34 @@ export function NotebookRoadmap() {
     useQuery<NotebookData>({
       queryKey: ["notebook", id],
       queryFn: async () => {
-        const res = await apiClient.get<{ notebook: NotebookData }>(
-          `/api/notebooks/${id}`,
-        );
-        return res.data.notebook;
+        try {
+          const res = await apiClient.get<{ notebook: NotebookData }>(
+            `/api/notebooks/${id}`,
+          );
+          const nb = res.data.notebook;
+          if (id && nb) {
+            await offlineCache.cacheNotebook(id as string, nb.name || "Notebook");
+            if (nb.roadmap) {
+              await offlineCache.cacheRoadmap(id as string, nb.roadmap);
+            }
+          }
+          return nb;
+        } catch (err) {
+          if (id) {
+            const cachedList = await offlineCache.getCachedNotebooks();
+            const match = cachedList.find((n) => n.notebookId === id);
+            if (match) {
+              const cachedRoadmap = await offlineCache.getCachedRoadmap(id as string);
+              return {
+                _id: match.notebookId,
+                name: match.title,
+                roadmap: cachedRoadmap || undefined,
+                roadmapStatus: "idle",
+              };
+            }
+          }
+          throw err;
+        }
       },
       enabled: !!id,
     });

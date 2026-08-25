@@ -3,7 +3,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
+import { documentDirectory, downloadAsync, getInfoAsync } from "expo-file-system/legacy";
+import { useNetworkState } from "expo-network";
+import { offlineCache } from "@/services/offlineCache";
+import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ScreenHeader from "@/components/ScreenHeader/ScreenHeader";
@@ -35,14 +38,67 @@ export function NotebookPodcast() {
   const queryClient = useQueryClient();
   const { lastEvent } = useSSE();
 
+  const networkState = useNetworkState();
+  const isOffline = networkState.isConnected === false;
+
+  const [downloading, setDownloading] = useState(false);
+  const [localUri, setLocalUri] = useState<string | null>(null);
+  const [localScript, setLocalScript] = useState<PodcastTurn[]>([]);
+
+  // Load cached podcast if any on mount or connectivity change
+  useEffect(() => {
+    if (!id) return;
+    offlineCache.getCachedPodcast(id as string).then((cached) => {
+      if (cached && cached.localUri) {
+        getInfoAsync(cached.localUri).then((info) => {
+          if (info.exists) {
+            setLocalUri(cached.localUri);
+            if (cached.script) {
+              setLocalScript(cached.script);
+            }
+          } else {
+            setLocalUri(null);
+          }
+        });
+      }
+    });
+  }, [id, isOffline]);
+
   const { data: notebook, isLoading: isLoadingNotebook } =
     useQuery<NotebookData>({
       queryKey: ["notebook", id],
       queryFn: async () => {
-        const res = await apiClient.get<{ notebook: NotebookData }>(
-          `/api/notebooks/${id}`,
-        );
-        return res.data.notebook;
+        try {
+          const res = await apiClient.get<{ notebook: NotebookData }>(
+            `/api/notebooks/${id}`,
+          );
+          const nb = res.data.notebook;
+          if (id && nb) {
+            await offlineCache.cacheNotebook(id as string, nb.name || "Notebook");
+          }
+          return nb;
+        } catch (err) {
+          if (id) {
+            const cachedList = await offlineCache.getCachedNotebooks();
+            const match = cachedList.find((n) => n.notebookId === id);
+            if (match) {
+              // Try to populate cached script
+              const cachedPodcast = await offlineCache.getCachedPodcast(id as string);
+              return {
+                _id: match.notebookId,
+                name: match.title,
+                podcast: cachedPodcast
+                  ? {
+                      audioUrl: cachedPodcast.localUri,
+                      script: cachedPodcast.script,
+                    }
+                  : undefined,
+                podcastStatus: "idle",
+              };
+            }
+          }
+          throw err;
+        }
       },
       enabled: !!id,
     });
@@ -77,6 +133,10 @@ export function NotebookPodcast() {
     generatePodcastMutation.isPending;
 
   const handleRegeneratePress = () => {
+    if (isOffline) {
+      Alert.alert("Offline", "Cannot regenerate podcasts in offline mode.");
+      return;
+    }
     Alert.alert(
       "Regenerate Podcast",
       "This will generate a new host script and rebuild the audio dialogue files. Continue?",
@@ -95,6 +155,37 @@ export function NotebookPodcast() {
         },
       ],
     );
+  };
+
+  const handleDownload = async () => {
+    if (!notebook?.podcast?.audioUrl || !id) return;
+    setDownloading(true);
+    try {
+      const remoteUrl = notebook.podcast.audioUrl.startsWith("http")
+        ? notebook.podcast.audioUrl
+        : `${API_BASE_URL}${notebook.podcast.audioUrl}`;
+
+      const targetPath = `${documentDirectory}podcast_${id}.mp3`;
+      const result = await downloadAsync(remoteUrl, targetPath);
+
+      if (result.status === 200) {
+        await offlineCache.cachePodcast(
+          id as string,
+          result.uri,
+          notebook.podcast.script || []
+        );
+        setLocalUri(result.uri);
+        setLocalScript(notebook.podcast.script || []);
+        Alert.alert("Success", "Podcast downloaded successfully for offline listening! 💾");
+      } else {
+        throw new Error("Download failed");
+      }
+    } catch (error) {
+      console.error("Failed to download podcast:", error);
+      Alert.alert("Error", "Failed to download podcast audio.");
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const containerInsetPadding = { paddingTop: insets.top };
@@ -122,6 +213,22 @@ export function NotebookPodcast() {
     );
   }
 
+  if (isOffline && !localUri) {
+    return (
+      <View style={[styles.container, containerInsetPadding]}>
+        <StatusBar style="dark" />
+        <ScreenHeader title="Audio Overview" />
+        <View style={styles.centered}>
+          <Ionicons name="wifi-outline" size={72} color={theme.colors.lightGrayIcon} />
+          <Text style={styles.emptyTitle}>Offline Mode</Text>
+          <Text style={styles.emptySubtitle}>
+            This podcast has not been downloaded yet. Connect to the internet to listen to it.
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
   if (!notebook?.podcast || !notebook.podcast.audioUrl) {
     return (
       <View style={[styles.container, containerInsetPadding]}>
@@ -137,6 +244,10 @@ export function NotebookPodcast() {
           </Text>
           <Pressable
             onPress={() => {
+              if (isOffline) {
+                Alert.alert("Offline", "Cannot generate podcasts in offline mode.");
+                return;
+              }
               generatePodcastMutation.mutate();
               router.replace(`/notebook/${id}` as any);
               Alert.alert(
@@ -157,11 +268,13 @@ export function NotebookPodcast() {
   }
 
   const audioUrl = notebook.podcast.audioUrl;
-  const fullAudioUrl = audioUrl.startsWith("http")
-    ? audioUrl
-    : `${API_BASE_URL}${audioUrl}`;
+  const fullAudioUrl = localUri
+    ? localUri
+    : (audioUrl.startsWith("http")
+      ? audioUrl
+      : `${API_BASE_URL}${audioUrl}`);
 
-  const script = notebook.podcast.script || [];
+  const script = notebook.podcast.script || localScript || [];
 
   return (
     <View style={[styles.container, containerInsetPadding]}>
@@ -184,12 +297,41 @@ export function NotebookPodcast() {
             <View style={styles.tag}>
               <Text style={styles.tagText}>{notebook.name}</Text>
             </View>
+            {localUri && (
+              <View style={[styles.tag, { backgroundColor: "rgba(16, 185, 129, 0.15)" }]}>
+                <Text style={[styles.tagText, { color: "#10b981" }]}>💾 Offline Ready</Text>
+              </View>
+            )}
           </View>
           <Text style={styles.titleText}>Podcast Discussion</Text>
           <Text style={styles.descriptionText}>
             Listen to Host A and Host B overview and synthesize the concepts in
             your notebook.
           </Text>
+
+          {!localUri ? (
+            <Pressable
+              onPress={handleDownload}
+              disabled={downloading}
+              style={[styles.primaryButton, { marginTop: 12, width: "100%", height: 42, justifyContent: "center" }]}
+            >
+              {downloading ? (
+                <ActivityIndicator size="small" color="#ffffff" />
+              ) : (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Ionicons name="download-outline" size={18} color="#ffffff" style={{ marginRight: 6 }} />
+                  <Text style={styles.primaryButtonText}>Download for Offline Listening</Text>
+                </View>
+              )}
+            </Pressable>
+          ) : (
+            <View style={{ flexDirection: "row", alignItems: "center", marginTop: 12 }}>
+              <Ionicons name="checkmark-circle" size={18} color="#10b981" />
+              <Text style={{ marginLeft: 6, color: "#10b981", fontWeight: "600", fontSize: 13 }}>
+                Saved Offline
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Audio Overview Podcast Player Card */}

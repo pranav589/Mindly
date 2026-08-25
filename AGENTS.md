@@ -56,3 +56,13 @@ ComponentName/
   export default MyScreen;
   ```
 - No logic, no styles, no JSX beyond the import/export.
+
+## 7. Styled via Theme Tokens Only
+
+- **Never** use hardcoded color hex values (`#ffffff`, `#000000`, etc.) or custom `rgba(...)` string values in styles.
+- **All** UI colors, backgrounds, borders, active/inactive states, and status colors must be imported and referenced exclusively from the global theme context: `@/theme/themes` or the `theme` object.
+
+## 8. Native Modules & Development Builds
+
+- Whenever adding, removing, or modifying libraries that include native code (e.g. edited package dependencies in `package.json`, modified permissions/configurations in `app.json` or `eas.json`), **you must explicitly stop and prompt the user to run a fresh development build** (e.g. `npx expo run:android` or similar build command). Expo Go / the current bundler cannot resolve native module additions on the fly without a fresh compilation.
+
