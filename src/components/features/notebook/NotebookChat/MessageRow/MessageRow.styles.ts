@@ -66,4 +66,15 @@ export const styles = StyleSheet.create({
     overflow: "hidden",
     marginHorizontal: 2,
   },
+  aiBubbleFooter: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.borderMuted,
+    paddingTop: 6,
+  },
+  speakButton: {
+    padding: 4,
+  },
 });

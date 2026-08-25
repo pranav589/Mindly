@@ -1,7 +1,8 @@
 import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { Text, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Text, View, Pressable } from "react-native";
+import * as Speech from "expo-speech";
 import { styles } from "./MessageRow.styles";
 import { Message } from "../types";
 
@@ -12,6 +13,38 @@ interface MessageRowProps {
 
 export const MessageRow = React.memo(
   ({ msg, onCitationClick }: MessageRowProps) => {
+    const [isSpeaking, setIsSpeaking] = useState(false);
+
+    // Stop speaking if component unmounts
+    useEffect(() => {
+      return () => {
+        Speech.stop();
+      };
+    }, []);
+
+    const handleSpeak = async () => {
+      try {
+        const speaking = await Speech.isSpeakingAsync();
+        if (speaking) {
+          await Speech.stop();
+          if (isSpeaking) {
+            setIsSpeaking(false);
+            return;
+          }
+        }
+
+        setIsSpeaking(true);
+        Speech.speak(msg.text, {
+          onDone: () => setIsSpeaking(false),
+          onError: () => setIsSpeaking(false),
+          onStopped: () => setIsSpeaking(false),
+        });
+      } catch (err) {
+        console.warn("Speech playback error:", err);
+        setIsSpeaking(false);
+      }
+    };
+
     const renderMessageTextWithCitations = (
       text: string,
       citations: any[] = [],
@@ -69,6 +102,15 @@ export const MessageRow = React.memo(
 
             <View style={styles.aiBubble}>
               {renderMessageTextWithCitations(msg.text, msg.citations ?? [])}
+              <View style={styles.aiBubbleFooter}>
+                <Pressable onPress={handleSpeak} style={styles.speakButton}>
+                  <Ionicons
+                    name={isSpeaking ? "volume-medium" : "volume-medium-outline"}
+                    size={16}
+                    color={isSpeaking ? theme.colors.primary : theme.colors.mutedGrayIcon}
+                  />
+                </Pressable>
+              </View>
             </View>
           </View>
         )}

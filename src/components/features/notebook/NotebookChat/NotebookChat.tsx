@@ -4,9 +4,16 @@ import { apiClient } from "@/services/api";
 import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  RecordingPresets,
+  requestRecordingPermissionsAsync,
+  setAudioModeAsync,
+  useAudioRecorder,
+} from "expo-audio";
+import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -34,6 +41,122 @@ export function NotebookChat() {
   const [messageText, setMessageText] = useState("");
   const { isTyping, setIsTyping, streamingText, setStreamingText, lastEvent } =
     useSSE();
+
+  const [isRecording, setIsRecording] = useState(false);
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const isBusyRef = useRef(false);
+  const startTimeRef = useRef<number>(0);
+
+  const toggleRecording = async () => {
+    if (isBusyRef.current) return;
+    isBusyRef.current = true;
+
+    try {
+      if (!isRecording) {
+        const { status } = await requestRecordingPermissionsAsync();
+        if (status !== "granted") {
+          alert("Microphone permission is required to record audio.");
+          return;
+        }
+
+        await setAudioModeAsync({
+          allowsRecording: true,
+          playsInSilentMode: true,
+        });
+
+        await recorder.prepareToRecordAsync();
+        recorder.record();
+
+        startTimeRef.current = Date.now();
+        setIsRecording(true);
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(
+          () => {},
+        );
+      } else {
+        setIsRecording(false);
+
+        const elapsed = Date.now() - startTimeRef.current;
+        if (elapsed < 800) {
+          await new Promise((r) => setTimeout(r, 800 - elapsed));
+        }
+
+        await recorder.stop();
+
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        const uri = recorder.uri;
+        if (uri) {
+          await uploadAudioAndTranscribe(uri);
+        }
+
+        await setAudioModeAsync({ allowsRecording: false }).catch(() => {});
+      }
+    } catch (err) {
+      console.error("Failed to stop recording:", err);
+      await setAudioModeAsync({ allowsRecording: false }).catch(() => {});
+      setIsRecording(false);
+    } finally {
+      isBusyRef.current = false;
+    }
+  };
+
+  const uploadAudioAndTranscribe = async (uri: string) => {
+    try {
+      setIsTyping(true);
+      const formData = new FormData();
+      const filename = uri.split("/").pop() || "recording.wav";
+      const match = /\.(\w+)$/.exec(filename);
+      const ext = match ? match[1].toLowerCase() : "wav";
+      const mimeMap: Record<string, string> = {
+        m4a: "audio/mp4",
+        mp4: "audio/mp4",
+        mp3: "audio/mpeg",
+        ogg: "audio/ogg",
+        wav: "audio/wav",
+      };
+      const type = mimeMap[ext] ?? `audio/${ext}`;
+
+      const cleanUri = uri.startsWith("file://")
+        ? uri
+        : uri.startsWith("file:/")
+          ? uri.replace("file:/", "file:///")
+          : `file://${uri}`;
+
+      // console.log("Transcribing audio file:", {
+      //   originalUri: uri,
+      //   cleanUri,
+      //   type,
+      //   filename,
+      // });
+
+      formData.append("file", {
+        uri: cleanUri,
+        name: filename,
+        type,
+      } as any);
+
+      const res = await apiClient.post<{ text: string }>(
+        "/api/transcribe",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
+
+      let sentQuery = false;
+      if (res.data?.text) {
+        sendMessage(res.data.text);
+        sentQuery = true;
+      }
+      if (!sentQuery) {
+        setIsTyping(false);
+      }
+    } catch (err) {
+      console.error("Failed to transcribe audio:", err);
+      alert("Failed to transcribe audio. Please try again.");
+      setIsTyping(false);
+    }
+  };
 
   const [citationSheetOpen, setCitationSheetOpen] = useState(false);
   const [menuSheetOpen, setMenuSheetOpen] = useState(false);
@@ -168,20 +291,25 @@ export function NotebookChat() {
     setCitationSheetOpen(true);
   }, []);
 
-  const handleSend = () => {
-    if (messageText.trim() === "") return;
+  const sendMessage = (text: string) => {
+    if (text.trim() === "") return;
 
     const userMsg: Message = {
       id: Math.random().toString(),
       sender: "user",
-      text: messageText,
+      text,
     };
 
     setMessages((prev) => [userMsg, ...prev]);
     setIsTyping(true);
     setStreamingText("");
 
-    sendQueryMutation.mutate(messageText);
+    sendQueryMutation.mutate(text);
+  };
+
+  const handleSend = () => {
+    if (messageText.trim() === "") return;
+    sendMessage(messageText);
     setMessageText("");
   };
 
@@ -249,7 +377,11 @@ export function NotebookChat() {
             style={styles.chatScroll}
             inverted={true}
             ListHeaderComponent={
-              isTyping ? <TypingRow streamingText={streamingText} /> : null
+              isRecording ? (
+                <TypingRow streamingText="" isListening={true} />
+              ) : isTyping ? (
+                <TypingRow streamingText={streamingText} />
+              ) : null
             }
             initialNumToRender={30}
             windowSize={11}
@@ -292,16 +424,25 @@ export function NotebookChat() {
 
             {messageText.trim() === "" ? (
               <Pressable
-                onPress={() => alert("Voice input")}
+                onPress={toggleRecording}
+                disabled={isTyping}
                 style={({ pressed }) => [
                   styles.inputMicButton,
-                  { opacity: pressed ? 0.7 : 1 },
+                  (pressed || isRecording) && {
+                    backgroundColor: "rgba(17, 120, 100, 0.15)",
+                    borderRadius: 18,
+                  },
+                  isTyping && { opacity: 0.4 },
                 ]}
               >
                 <Ionicons
-                  name="mic-outline"
+                  name={isRecording ? "mic" : "mic-outline"}
                   size={20}
-                  color={theme.colors.textSecondary}
+                  color={
+                    isRecording
+                      ? theme.colors.primary
+                      : theme.colors.textSecondary
+                  }
                 />
               </Pressable>
             ) : (
