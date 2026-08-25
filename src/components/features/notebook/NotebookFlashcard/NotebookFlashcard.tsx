@@ -26,11 +26,62 @@ export function NotebookFlashcard() {
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
 
-  const { sendLocalNotification } = useNotifications();
+  const { sendLocalNotification, scheduleStudyReminder, cancelStudyReminder } = useNotifications();
   const isGeneratingRef = useRef(false);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+
+  // Fetch notebook details
+  const { data: notebook } = useQuery({
+    queryKey: ["notebook", id],
+    queryFn: async () => {
+      const res = await apiClient.get<{ notebook: any }>(`/api/notebooks/${id}`);
+      return res.data.notebook;
+    },
+    enabled: !!id,
+  });
+  const { data: cards = [], isLoading: isFetchingCards } = useQuery({
+    queryKey: ["flashcards", id],
+    queryFn: async () => {
+      const res = await apiClient.get<any[]>(`/api/flashcards`, {
+        params: { notebookId: id },
+      });
+      return res.data;
+    },
+    enabled: !!id,
+  });
+
+  const getEarliestNextReviewDate = (flashcards: any[]) => {
+    if (!flashcards || flashcards.length === 0) return null;
+    const now = Date.now();
+    let earliest = null;
+    for (const card of flashcards) {
+      if (card.nextReview) {
+        const reviewTime = new Date(card.nextReview).getTime();
+        if (!isNaN(reviewTime) && reviewTime > now) {
+          if (!earliest || reviewTime < earliest) {
+            earliest = reviewTime;
+          }
+        }
+      }
+    }
+    return earliest ? new Date(earliest) : null;
+  };
+
+  // Reschedule study reminder whenever cards list or notebook details update
+  useEffect(() => {
+    if (!notebook || !cards || cards.length === 0) return;
+    const earliestDate = getEarliestNextReviewDate(cards);
+    // Fallback to tomorrow if no future date calculated
+    const targetDate = earliestDate || new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    scheduleStudyReminder(
+      id as string,
+      notebook.name || "Notebook",
+      targetDate
+    );
+  }, [cards, notebook, id, scheduleStudyReminder]);
 
   // AppState change listener for background notifications
   useEffect(() => {
@@ -50,17 +101,6 @@ export function NotebookFlashcard() {
     );
     return () => appStateSub.remove();
   }, [id, sendLocalNotification]);
-
-  const { data: cards = [], isLoading: isFetchingCards } = useQuery({
-    queryKey: ["flashcards", id],
-    queryFn: async () => {
-      const res = await apiClient.get<any[]>(`/api/flashcards`, {
-        params: { notebookId: id },
-      });
-      return res.data;
-    },
-    enabled: !!id,
-  });
 
   const generateCardsMutation = useMutation({
     mutationFn: async () => {

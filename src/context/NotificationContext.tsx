@@ -1,14 +1,23 @@
+import { useAuth } from "@/hooks/useAuth";
 import { theme } from "@/theme/themes";
 import { useRouter } from "expo-router";
 import React, { createContext, useContext, useEffect } from "react";
 import { Platform } from "react-native";
-import { useAuth } from "@/hooks/useAuth";
 
 let Notifications: any = null;
 try {
   Notifications = require("expo-notifications");
 } catch (e) {
-  console.warn("⚠️ expo-notifications native module is not available. Notifications are disabled.");
+  console.warn(
+    "⚠️ expo-notifications native module is not available. Notifications are disabled.",
+  );
+}
+
+let SecureStore: any = null;
+try {
+  SecureStore = require("expo-secure-store");
+} catch (e) {
+  console.warn("⚠️ expo-secure-store is not available. Storage is disabled.");
 }
 
 interface NotificationContextType {
@@ -17,10 +26,18 @@ interface NotificationContextType {
     body: string,
     data?: Record<string, any>,
   ) => Promise<string | undefined>;
+  scheduleStudyReminder: (
+    notebookId: string,
+    notebookName: string,
+    nextReviewDate: Date,
+  ) => Promise<void>;
+  cancelStudyReminder: (notebookId: string) => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextType>({
   sendLocalNotification: async () => undefined,
+  scheduleStudyReminder: async () => {},
+  cancelStudyReminder: async () => {},
 });
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -106,7 +123,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
     data: Record<string, any> = {},
   ) => {
     if (!Notifications) {
-      console.warn("⚠️ Cannot send local notification: expo-notifications is not available.");
+      console.warn(
+        "⚠️ Cannot send local notification: expo-notifications is not available.",
+      );
       return undefined;
     }
     try {
@@ -125,12 +144,102 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const cancelStudyReminder = async (notebookId: string) => {
+    if (!Notifications || !SecureStore) return;
+    try {
+      const key = `study_reminder_${notebookId}`;
+      const scheduledId = await SecureStore.getItemAsync(key);
+      if (scheduledId) {
+        await Notifications.cancelScheduledNotificationAsync(scheduledId);
+        await SecureStore.deleteItemAsync(key);
+        console.log(
+          `Cancelled study reminder notification for notebook: ${notebookId}`,
+        );
+      }
+    } catch (err) {
+      console.error("Failed to cancel study reminder:", err);
+    }
+  };
+
+  const scheduleStudyReminder = async (
+    notebookId: string,
+    notebookName: string,
+    nextReviewDate: Date,
+  ) => {
+    if (!Notifications || !SecureStore) return;
+    try {
+      // Cancel existing notification for this notebook
+      await cancelStudyReminder(notebookId);
+
+      // Fetch global study reminder settings
+      const settingsRaw = await SecureStore.getItemAsync(
+        "study_reminder_settings",
+      );
+      let settings = { enabled: true, hour: 19, minute: 0 }; // Default 7:00 PM
+      if (settingsRaw) {
+        try {
+          settings = JSON.parse(settingsRaw);
+        } catch (parseErr) {
+          console.warn(
+            "Failed to parse study reminder settings, using default.",
+          );
+        }
+      }
+
+      if (!settings.enabled) {
+        console.log("Study reminders are disabled in settings.");
+        return;
+      }
+
+      // Calculate target review date
+      const targetDate = new Date(nextReviewDate);
+      targetDate.setHours(settings.hour);
+      targetDate.setMinutes(settings.minute);
+      targetDate.setSeconds(0);
+      targetDate.setMilliseconds(0);
+
+      // If targetDate is in the past, push it to tomorrow or next valid day
+      const now = new Date();
+      if (targetDate.getTime() <= now.getTime()) {
+        targetDate.setDate(targetDate.getDate() + 1);
+      }
+
+      // Schedule the calendar trigger notification
+      const notificationId = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Study Reminder 📚",
+          body: `Time to review your flashcards for "${notebookName}"! Keep up your streak.`,
+          data: { notebookId, screen: "flashcard" },
+          sound: true,
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: targetDate,
+        },
+      });
+
+      // Store scheduled notification ID
+      const key = `study_reminder_${notebookId}`;
+      await SecureStore.setItemAsync(key, notificationId);
+      console.log(
+        `Scheduled study reminder for "${notebookName}" at ${targetDate.toString()} (ID: ${notificationId})`,
+      );
+    } catch (err) {
+      console.error("Failed to schedule study reminder:", err);
+    }
+  };
+
   return (
-    <NotificationContext.Provider value={{ sendLocalNotification }}>
+    <NotificationContext.Provider
+      value={{
+        sendLocalNotification,
+        scheduleStudyReminder,
+        cancelStudyReminder,
+      }}
+    >
       {children}
     </NotificationContext.Provider>
   );
 };
 
 export const useNotifications = () => useContext(NotificationContext);
-
