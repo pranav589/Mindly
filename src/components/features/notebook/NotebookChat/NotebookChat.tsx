@@ -27,6 +27,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 import { MessageRow } from "./MessageRow/MessageRow";
 import { styles } from "./NotebookChat.styles";
 import { CitationData, Message } from "./types";
@@ -38,6 +39,7 @@ export function NotebookChat() {
   const { id } = useLocalSearchParams();
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
+  const { showAlert } = useCustomAlert();
 
   const networkState = useNetworkState();
   const isOffline = networkState.isConnected === false;
@@ -59,7 +61,11 @@ export function NotebookChat() {
       if (!isRecording) {
         const { status } = await requestRecordingPermissionsAsync();
         if (status !== "granted") {
-          alert("Microphone permission is required to record audio.");
+          showAlert({
+            title: "Permission Required",
+            message: "Microphone permission is required to record audio.",
+            type: "warning",
+          });
           return;
         }
 
@@ -157,7 +163,11 @@ export function NotebookChat() {
       }
     } catch (err) {
       console.error("Failed to transcribe audio:", err);
-      alert("Failed to transcribe audio. Please try again.");
+      showAlert({
+        title: "Error",
+        message: "Failed to transcribe audio. Please try again.",
+        type: "error",
+      });
       setIsTyping(false);
     }
   };

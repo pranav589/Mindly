@@ -6,7 +6,8 @@ import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 import { useBackgroundNotification } from "@/hooks/useBackgroundNotification";
 import { styles } from "./NotebookQuiz.styles";
 import { QuizHomeView } from "./QuizHomeView/QuizHomeView";
@@ -48,6 +49,7 @@ export function NotebookQuiz() {
   const queryClient = useQueryClient();
 
   const { sendLocalNotification, requestNotificationPermissions } = useNotifications();
+  const { showAlert } = useCustomAlert();
 
 
   // Quiz state
@@ -137,7 +139,11 @@ export function NotebookQuiz() {
         { notebookId: id, screen: "quiz" },
       );
       console.error("Quiz generation error:", backendError);
-      Alert.alert("Error", backendError);
+      showAlert({
+        title: "Error",
+        message: backendError,
+        type: "error",
+      });
     },
   });
 
@@ -167,7 +173,11 @@ export function NotebookQuiz() {
     },
     onError: (err) => {
       console.error(err);
-      Alert.alert("Error", "Failed to submit quiz attempt");
+      showAlert({
+        title: "Error",
+        message: "Failed to submit quiz attempt",
+        type: "error",
+      });
     },
   });
 
@@ -241,10 +251,11 @@ export function NotebookQuiz() {
     await requestNotificationPermissions();
     generateQuizMutation.mutate();
     router.replace(`/notebook/${id}` as any);
-    Alert.alert(
-      "Generating Quiz",
-      "Your practice quiz is being generated in the background. You'll receive a notification when it's ready!"
-    );
+    showAlert({
+      title: "Generating Quiz",
+      message: "Your practice quiz is being generated in the background. You'll receive a notification when it's ready!",
+      type: "info",
+    });
   };
 
   if (isFetchingQuiz || generateQuizMutation.isPending) {

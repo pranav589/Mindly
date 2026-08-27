@@ -4,7 +4,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as DocumentPicker from "expo-document-picker";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 import BottomSheet from "@/components/BottomSheet";
 import { useImageSource } from "@/hooks/useImageSource";
 import { apiClient } from "@/services/api";
@@ -18,6 +19,7 @@ interface AddSourceDrawersProps {
 export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
   const { id } = useLocalSearchParams();
   const queryClient = useQueryClient();
+  const { showAlert } = useCustomAlert();
 
   const [activeInputType, setActiveInputType] = useState<
     "pdf" | "youtube" | "web" | "text" | "camera" | "image" | null
@@ -73,7 +75,11 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
     },
     onError: (err) => {
       console.error(err);
-      Alert.alert("Error", "Failed to create source");
+      showAlert({
+        title: "Error",
+        message: "Failed to create source",
+        type: "error",
+      });
     },
   });
 
@@ -102,7 +108,11 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
       }
     } catch (error) {
       console.error("Error picking document:", error);
-      Alert.alert("Error", "Failed to select document");
+      showAlert({
+        title: "Error",
+        message: "Failed to select document",
+        type: "error",
+      });
     }
   };
 
@@ -110,7 +120,11 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
 
   const submitWebUrl = () => {
     if (!webUrl.trim()) {
-      Alert.alert("Error", "Please enter a valid URL");
+      showAlert({
+        title: "Error",
+        message: "Please enter a valid URL",
+        type: "error",
+      });
       return;
     }
     createSourceMutation.mutate({
@@ -122,7 +136,11 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
 
   const submitYoutubeUrl = () => {
     if (!youtubeUrl.trim()) {
-      Alert.alert("Error", "Please enter a YouTube video URL");
+      showAlert({
+        title: "Error",
+        message: "Please enter a YouTube video URL",
+        type: "error",
+      });
       return;
     }
     createSourceMutation.mutate({
@@ -134,7 +152,11 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
 
   const submitText = () => {
     if (!textTitle.trim() || !textContent.trim()) {
-      Alert.alert("Error", "Please fill in both the title and text content");
+      showAlert({
+        title: "Error",
+        message: "Please fill in both the title and text content",
+        type: "error",
+      });
       return;
     }
     createSourceMutation.mutate({

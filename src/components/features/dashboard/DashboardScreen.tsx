@@ -9,7 +9,6 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
-  Alert,
   Image,
   KeyboardAvoidingView,
   Modal,
@@ -20,6 +19,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getStyles } from "./DashboardScreen.styles";
 
@@ -32,6 +32,7 @@ export default function DashboardScreen() {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [createModalVisible, setCreateModalVisible] = useState(false);
+  const { showAlert } = useCustomAlert();
   const [newNotebookName, setNewNotebookName] = useState("");
   const [cachedNotebookIds, setCachedNotebookIds] = useState<Set<string>>(
     new Set(),
@@ -79,7 +80,11 @@ export default function DashboardScreen() {
     },
     onError: (err) => {
       console.error(err);
-      Alert.alert("Error", "Failed to create notebook");
+      showAlert({
+        title: "Error",
+        message: "Failed to create notebook",
+        type: "error",
+      });
     },
   });
 
@@ -91,7 +96,11 @@ export default function DashboardScreen() {
   const submitNewNotebook = () => {
     const trimmedName = newNotebookName.trim();
     if (!trimmedName) {
-      Alert.alert("Error", "Please enter a notebook name");
+      showAlert({
+        title: "Error",
+        message: "Please enter a notebook name",
+        type: "error",
+      });
       return;
     }
     setCreateModalVisible(false);

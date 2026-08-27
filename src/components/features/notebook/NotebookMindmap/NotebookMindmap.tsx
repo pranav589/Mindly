@@ -8,7 +8,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
 import { styles } from "./NotebookMindmap.styles";
@@ -64,6 +65,7 @@ export function NotebookMindmap() {
   const { lastEvent } = useSSE();
 
   const { requestNotificationPermissions } = useNotifications();
+  const { showAlert } = useCustomAlert();
 
   const [selectedNode, setSelectedNode] = useState<MindMapNode | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -101,10 +103,11 @@ export function NotebookMindmap() {
         "Mindmap generation error:",
         err?.response?.data?.error || err.message,
       );
-      Alert.alert(
-        "Error",
-        err?.response?.data?.error ?? "Failed to initiate mind map generation.",
-      );
+      showAlert({
+        title: "Error",
+        message: err?.response?.data?.error ?? "Failed to initiate mind map generation.",
+        type: "error",
+      });
     },
   });
 
@@ -116,10 +119,11 @@ export function NotebookMindmap() {
     await requestNotificationPermissions();
     generateMindmapMutation.mutate();
     router.replace(`/notebook/${id}` as any);
-    Alert.alert(
-      "Generating Mind Map",
-      "Your interactive mind map is being generated in the background. You'll receive a notification when it's ready!"
-    );
+    showAlert({
+      title: "Generating Mind Map",
+      message: "Your interactive mind map is being generated in the background. You'll receive a notification when it's ready!",
+      type: "info",
+    });
   };
 
   const handleWebViewMessage = (event: any) => {
@@ -233,17 +237,18 @@ export function NotebookMindmap() {
         <Text style={styles.headerTitle}>Concept Mind Map</Text>
         <Pressable
           onPress={() => {
-            Alert.alert(
-              "Regenerate Mind Map",
-              "This will rebuild your concept layout from current notebook sources. Continue?",
-              [
+            showAlert({
+              title: "Regenerate Mind Map",
+              message: "This will rebuild your concept layout from current notebook sources. Continue?",
+              type: "warning",
+              buttons: [
                 { text: "Cancel", style: "cancel" },
                 {
                   text: "Regenerate",
                   onPress: handleGenerateMindmap,
                 },
               ],
-            );
+            });
           }}
           style={styles.headerButton}
         >

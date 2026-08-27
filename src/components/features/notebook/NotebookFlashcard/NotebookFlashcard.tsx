@@ -10,11 +10,11 @@ import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   Text,
   View,
 } from "react-native";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 import { useBackgroundNotification } from "@/hooks/useBackgroundNotification";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FlashcardItem } from "./FlashcardItem/FlashcardItem";
@@ -34,6 +34,7 @@ export function NotebookFlashcard() {
     cancelStudyReminder,
     requestNotificationPermissions,
   } = useNotifications();
+  const { showAlert } = useCustomAlert();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -149,7 +150,11 @@ export function NotebookFlashcard() {
         screen: "flashcard",
       });
       console.error("Flashcard generation error:", backendError);
-      Alert.alert("Error", backendError);
+      showAlert({
+        title: "Error",
+        message: backendError,
+        type: "error",
+      });
     },
   });
 
@@ -252,24 +257,26 @@ export function NotebookFlashcard() {
     await requestNotificationPermissions();
     generateCardsMutation.mutate();
     router.replace(`/notebook/${id}` as any);
-    Alert.alert(
-      "Generating Flashcards",
-      "Your flashcards are being generated in the background. You'll receive a notification when they're ready!",
-    );
+    showAlert({
+      title: "Generating Flashcards",
+      message: "Your flashcards are being generated in the background. You'll receive a notification when they're ready!",
+      type: "info",
+    });
   };
 
   const handleRegenerate = () => {
-    Alert.alert(
-      "Regenerate Flashcards",
-      "This will generate a new set of flashcards from your sources. Continue?",
-      [
+    showAlert({
+      title: "Regenerate Flashcards",
+      message: "This will generate a new set of flashcards from your sources. Continue?",
+      type: "warning",
+      buttons: [
         { text: "Cancel", style: "cancel" },
         {
           text: "Regenerate",
           onPress: handleGenerateFlashcards,
         },
       ],
-    );
+    });
   };
 
   const containerInsetPadding = { paddingTop: insets.top };

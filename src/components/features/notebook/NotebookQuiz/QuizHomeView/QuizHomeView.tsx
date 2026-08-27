@@ -4,8 +4,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 import { styles } from "./QuizHomeView.styles";
 
 interface Attempt {
@@ -35,6 +36,7 @@ export function QuizHomeView({
   const insets = useSafeAreaInsets();
 
   const router = useRouter();
+  const { showAlert } = useCustomAlert();
 
   const bestAttempt = attempts.reduce<Attempt | null>(
     (best, a) =>
@@ -49,17 +51,18 @@ export function QuizHomeView({
   };
 
   const handleRegeneratePress = () => {
-    Alert.alert(
-      "Regenerate Quiz",
-      "This will create a new quiz from your sources. The old quiz history will be preserved.",
-      [
+    showAlert({
+      title: "Regenerate Quiz",
+      message: "This will create a new quiz from your sources. The old quiz history will be preserved.",
+      type: "warning",
+      buttons: [
         { text: "Cancel", style: "cancel" },
         {
           text: "Regenerate",
           onPress: onRegenerate,
         },
       ],
-    );
+    });
   };
 
   const containerInsetPadding = { paddingTop: insets.top };

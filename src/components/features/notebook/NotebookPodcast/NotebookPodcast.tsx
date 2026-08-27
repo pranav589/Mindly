@@ -13,6 +13,7 @@ import ScreenHeader from "@/components/ScreenHeader/ScreenHeader";
 import { useSSE } from "@/context/SSEContext";
 import { API_BASE_URL, apiClient } from "@/services/api";
 import { useNotifications } from "@/context/NotificationContext";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 import { styles } from "./NotebookPodcast.styles";
 import { PodcastAudioPlayer } from "./PodcastAudioPlayer/PodcastAudioPlayer";
 import { PodcastTranscript } from "./PodcastTranscript/PodcastTranscript";
@@ -39,6 +40,7 @@ export function NotebookPodcast() {
   const queryClient = useQueryClient();
   const { lastEvent } = useSSE();
   const { requestNotificationPermissions } = useNotifications();
+  const { showAlert } = useCustomAlert();
 
   const networkState = useNetworkState();
   const isOffline = networkState.isConnected === false;
@@ -123,10 +125,11 @@ export function NotebookPodcast() {
     },
     onError: (err: any) => {
       console.warn("Podcast generation error:", err?.response?.data?.error || err.message);
-      Alert.alert(
-        "Error",
-        err?.response?.data?.error ?? "Failed to initiate podcast generation.",
-      );
+      showAlert({
+        title: "Error",
+        message: err?.response?.data?.error ?? "Failed to initiate podcast generation.",
+        type: "error",
+      });
     },
   });
 
@@ -138,34 +141,44 @@ export function NotebookPodcast() {
 
   const handleGeneratePodcast = async () => {
     if (isOffline) {
-      Alert.alert("Offline", "Cannot generate podcasts in offline mode.");
+      showAlert({
+        title: "Offline",
+        message: "Cannot generate podcasts in offline mode.",
+        type: "warning",
+      });
       return;
     }
     await requestNotificationPermissions();
     generatePodcastMutation.mutate();
     router.replace(`/notebook/${id}` as any);
-    Alert.alert(
-      "Generating Podcast",
-      "Your AI podcast discussion is being generated in the background. You'll receive a notification when it's ready!"
-    );
+    showAlert({
+      title: "Generating Podcast",
+      message: "Your AI podcast discussion is being generated in the background. You'll receive a notification when it's ready!",
+      type: "info",
+    });
   };
 
   const handleRegeneratePress = () => {
     if (isOffline) {
-      Alert.alert("Offline", "Cannot regenerate podcasts in offline mode.");
+      showAlert({
+        title: "Offline",
+        message: "Cannot regenerate podcasts in offline mode.",
+        type: "warning",
+      });
       return;
     }
-    Alert.alert(
-      "Regenerate Podcast",
-      "This will generate a new host script and rebuild the audio dialogue files. Continue?",
-      [
+    showAlert({
+      title: "Regenerate Podcast",
+      message: "This will generate a new host script and rebuild the audio dialogue files. Continue?",
+      type: "warning",
+      buttons: [
         { text: "Cancel", style: "cancel" },
         {
           text: "Regenerate",
           onPress: handleGeneratePodcast,
         },
       ],
-    );
+    });
   };
 
   const handleDownload = async () => {
@@ -187,13 +200,21 @@ export function NotebookPodcast() {
         );
         setLocalUri(result.uri);
         setLocalScript(notebook.podcast.script || []);
-        Alert.alert("Success", "Podcast downloaded successfully for offline listening! 💾");
+        showAlert({
+          title: "Success",
+          message: "Podcast downloaded successfully for offline listening! 💾",
+          type: "success",
+        });
       } else {
         throw new Error("Download failed");
       }
     } catch (error) {
       console.error("Failed to download podcast:", error);
-      Alert.alert("Error", "Failed to download podcast audio.");
+      showAlert({
+        title: "Error",
+        message: "Failed to download podcast audio.",
+        type: "error",
+      });
     } finally {
       setDownloading(false);
     }

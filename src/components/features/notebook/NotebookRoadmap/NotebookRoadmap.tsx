@@ -6,12 +6,12 @@ import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   ScrollView,
   Text,
   View,
 } from "react-native";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BottomSheet from "@/components/BottomSheet";
 import { useSSE } from "@/context/SSEContext";
@@ -51,6 +51,7 @@ export function NotebookRoadmap() {
   const { lastEvent } = useSSE();
 
   const { requestNotificationPermissions } = useNotifications();
+  const { showAlert } = useCustomAlert();
 
   const [activeSource, setActiveSource] = useState<RoadmapNode | null>(null);
   const [sourceSheetOpen, setSourceSheetOpen] = useState(false);
@@ -109,10 +110,11 @@ export function NotebookRoadmap() {
     },
     onError: (err: any) => {
       console.warn("Roadmap generation error:", err?.response?.data?.error || err.message);
-      Alert.alert(
-        "Error",
-        err?.response?.data?.error ?? "Failed to initiate roadmap generation.",
-      );
+      showAlert({
+        title: "Error",
+        message: err?.response?.data?.error ?? "Failed to initiate roadmap generation.",
+        type: "error",
+      });
     },
   });
 
@@ -126,24 +128,26 @@ export function NotebookRoadmap() {
     await requestNotificationPermissions();
     generateRoadmapMutation.mutate();
     router.replace(`/notebook/${id}` as any);
-    Alert.alert(
-      "Generating Roadmap",
-      "Your personalized syllabus roadmap is being generated in the background. You'll receive a notification when it's ready!"
-    );
+    showAlert({
+      title: "Generating Roadmap",
+      message: "Your personalized syllabus roadmap is being generated in the background. You'll receive a notification when it's ready!",
+      type: "info",
+    });
   };
 
   const handleRegenerate = () => {
-    Alert.alert(
-      "Regenerate Roadmap",
-      "This will analyze your current documents and construct a new learning syllabus. Continue?",
-      [
+    showAlert({
+      title: "Regenerate Roadmap",
+      message: "This will analyze your current documents and construct a new learning syllabus. Continue?",
+      type: "warning",
+      buttons: [
         { text: "Cancel", style: "cancel" },
         {
           text: "Regenerate",
           onPress: handleGenerateRoadmap,
         },
       ],
-    );
+    });
   };
 
   const containerInsetPadding = { paddingTop: insets.top };

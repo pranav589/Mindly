@@ -8,9 +8,8 @@ import { loadStoredTokens } from "@/services/api";
 
 WebBrowser.maybeCompleteAuthSession();
 import { AuthProvider } from "@/context/AuthContext";
-import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
-import { NotificationProvider } from "@/context/NotificationContext";
-import { MiniPlayer } from "@/components/MiniPlayer/MiniPlayer";
+
+import { CustomAlertProvider } from "@/context/CustomAlertContext";
 
 import { theme } from "@/theme/themes";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -44,22 +43,19 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <AudioPlayerProvider>
-            <NotificationProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="index" />
-                  <Stack.Screen name="(auth)" />
-                  <Stack.Screen name="(protected)" />
-                  <Stack.Screen name="redirect" />
-                </Stack>
-                <OfflineBanner />
-                <MiniPlayer />
-              </GestureHandlerRootView>
-            </NotificationProvider>
-          </AudioPlayerProvider>
-        </AuthProvider>
+        <CustomAlertProvider>
+          <AuthProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="(protected)" />
+                <Stack.Screen name="redirect" />
+              </Stack>
+              <OfflineBanner />
+            </GestureHandlerRootView>
+          </AuthProvider>
+        </CustomAlertProvider>
       </QueryClientProvider>
     </SafeAreaProvider>
   );

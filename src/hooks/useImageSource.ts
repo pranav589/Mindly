@@ -3,10 +3,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { SaveFormat, useImageManipulator } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
-import { Alert } from "react-native";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 
 export function useImageSource(notebookId: string, onSuccess?: () => void) {
   const queryClient = useQueryClient();
+  const { showAlert } = useCustomAlert();
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [originalName, setOriginalName] = useState<string>("");
 
@@ -40,7 +41,11 @@ export function useImageSource(notebookId: string, onSuccess?: () => void) {
     },
     onError: (err) => {
       console.error("[useImageSource] Upload error:", err);
-      Alert.alert("Error", "Failed to upload image source.");
+      showAlert({
+        title: "Error",
+        message: "Failed to upload image source.",
+        type: "error",
+      });
     },
   });
 
@@ -72,7 +77,11 @@ export function useImageSource(notebookId: string, onSuccess?: () => void) {
         uploadMutation.mutate(filePayload);
       } catch (err) {
         console.error("[useImageSource] Manipulation error:", err);
-        Alert.alert("Error", "Failed to compress captured image.");
+        showAlert({
+          title: "Error",
+          message: "Failed to compress captured image.",
+          type: "error",
+        });
       } finally {
         setImageUri(null);
         setOriginalName("");
@@ -93,12 +102,13 @@ export function useImageSource(notebookId: string, onSuccess?: () => void) {
       }
 
       if (!permissionResult.granted) {
-        Alert.alert(
-          "Permission Required",
-          `We need permission to access your ${
+        showAlert({
+          title: "Permission Required",
+          message: `We need permission to access your ${
             mode === "camera" ? "camera" : "photos"
           } to upload scans.`,
-        );
+          type: "warning",
+        });
         return;
       }
 
@@ -122,7 +132,11 @@ export function useImageSource(notebookId: string, onSuccess?: () => void) {
       }
     } catch (error) {
       console.error("[useImageSource] Error selecting/capturing image:", error);
-      Alert.alert("Error", "Failed to capture or select image.");
+      showAlert({
+        title: "Error",
+        message: "Failed to capture or select image.",
+        type: "error",
+      });
     }
   };
 

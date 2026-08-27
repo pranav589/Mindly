@@ -5,6 +5,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { theme } from "@/theme/themes";
+import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
+import { NotificationProvider } from "@/context/NotificationContext";
+import { MiniPlayer } from "@/components/MiniPlayer/MiniPlayer";
 
 export default function ProtectedLayout() {
   const router = useRouter();
@@ -29,11 +32,16 @@ export default function ProtectedLayout() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }} edges={["bottom"]}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="notebook" />
-      </Stack>
-    </SafeAreaView>
+    <AudioPlayerProvider>
+      <NotificationProvider>
+        <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }} edges={["bottom"]}>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="notebook" />
+          </Stack>
+          <MiniPlayer />
+        </SafeAreaView>
+      </NotificationProvider>
+    </AudioPlayerProvider>
   );
 }

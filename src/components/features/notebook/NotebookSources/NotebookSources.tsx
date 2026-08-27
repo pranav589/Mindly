@@ -7,7 +7,8 @@ import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AddSourceDrawers } from "@/components/AddSourceDrawers/AddSourceDrawers";
 import { styles } from "./NotebookSources.styles";
@@ -18,6 +19,7 @@ export function NotebookSources() {
   const { id } = useLocalSearchParams();
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
+  const { showAlert } = useCustomAlert();
 
   const [drawerVisible, setDrawerVisible] = useState(false);
 
@@ -56,7 +58,11 @@ export function NotebookSources() {
     },
     onError: (err) => {
       console.error(err);
-      Alert.alert("Error", "Failed to delete source");
+      showAlert({
+        title: "Error",
+        message: "Failed to delete source",
+        type: "error",
+      });
     },
   });
 
@@ -68,21 +74,30 @@ export function NotebookSources() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sources", id] });
       queryClient.invalidateQueries({ queryKey: ["notebook", id] });
-      Alert.alert("Success", "Source queued for re-indexing!");
+      showAlert({
+        title: "Success",
+        message: "Source queued for re-indexing!",
+        type: "success",
+      });
     },
     onError: (err: any) => {
       console.error(err);
-      Alert.alert("Error", err.response?.data?.error || "Failed to re-index source");
+      showAlert({
+        title: "Error",
+        message: err.response?.data?.error || "Failed to re-index source",
+        type: "error",
+      });
     },
   });
 
   const handleSourceActions = (source: any) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
 
-    Alert.alert(
-      "Source Actions",
-      `Choose an action for "${source.name}"`,
-      [
+    showAlert({
+      title: "Source Actions",
+      message: `Choose an action for "${source.name}"`,
+      type: "info",
+      buttons: [
         { text: "Cancel", style: "cancel" },
         {
           text: "Re-index (Sync to Vector DB)",
@@ -92,10 +107,11 @@ export function NotebookSources() {
           text: "Delete Source",
           style: "destructive",
           onPress: () => {
-            Alert.alert(
-              "Confirm Delete",
-              `Are you sure you want to delete "${source.name}"? This cannot be undone.`,
-              [
+            showAlert({
+              title: "Confirm Delete",
+              message: `Are you sure you want to delete "${source.name}"? This cannot be undone.`,
+              type: "warning",
+              buttons: [
                 { text: "Cancel", style: "cancel" },
                 {
                   text: "Delete",
@@ -103,11 +119,11 @@ export function NotebookSources() {
                   onPress: () => deleteSourceMutation.mutate(source._id),
                 },
               ]
-            );
+            });
           },
         },
       ],
-    );
+    });
   };
 
   const containerInsetStyle = { paddingTop: insets.top };

@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import React, { createContext, useContext, useState } from "react";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 
 export interface User {
   _id: string;
@@ -29,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const queryClient = useQueryClient();
+  const { showAlert } = useCustomAlert();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // TanStack Query to fetch current user profile
@@ -80,7 +82,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     } catch (error) {
       console.error("Google Sign In failed:", error);
-      alert("Failed to sign in with Google.");
+      showAlert({
+        title: "Error",
+        message: "Failed to sign in with Google.",
+        type: "error",
+      });
     } finally {
       setIsLoggingIn(false);
     }
