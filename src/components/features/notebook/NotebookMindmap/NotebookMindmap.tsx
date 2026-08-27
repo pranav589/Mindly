@@ -1,21 +1,16 @@
+import BottomSheet from "@/components/BottomSheet";
+import { useNotifications } from "@/context/NotificationContext";
+import { useSSE } from "@/context/SSEContext";
+import { apiClient } from "@/services/api";
 import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
-import BottomSheet from "@/components/BottomSheet";
-import { useSSE } from "@/context/SSEContext";
-import { apiClient } from "@/services/api";
 import { styles } from "./NotebookMindmap.styles";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -68,6 +63,8 @@ export function NotebookMindmap() {
   const queryClient = useQueryClient();
   const { lastEvent } = useSSE();
 
+  const { requestNotificationPermissions } = useNotifications();
+
   const [selectedNode, setSelectedNode] = useState<MindMapNode | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
@@ -100,7 +97,10 @@ export function NotebookMindmap() {
       queryClient.invalidateQueries({ queryKey: ["notebook", id] });
     },
     onError: (err: any) => {
-      console.warn("Mindmap generation error:", err?.response?.data?.error || err.message);
+      console.warn(
+        "Mindmap generation error:",
+        err?.response?.data?.error || err.message,
+      );
       Alert.alert(
         "Error",
         err?.response?.data?.error ?? "Failed to initiate mind map generation.",
@@ -111,6 +111,16 @@ export function NotebookMindmap() {
   const isGenerating =
     notebook?.mindMapStatus === "generating" ||
     generateMindmapMutation.isPending;
+
+  const handleGenerateMindmap = async () => {
+    await requestNotificationPermissions();
+    generateMindmapMutation.mutate();
+    router.replace(`/notebook/${id}` as any);
+    Alert.alert(
+      "Generating Mind Map",
+      "Your interactive mind map is being generated in the background. You'll receive a notification when it's ready!"
+    );
+  };
 
   const handleWebViewMessage = (event: any) => {
     try {
@@ -137,13 +147,27 @@ export function NotebookMindmap() {
 
   if (isGenerating) {
     return (
-      <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={styles.generatingTitle}>Structuring Concept Map</Text>
-        <Text style={styles.generatingSubtitle}>
-          {progressText ||
-            "Analyzing source materials and linking core ideas..."}
-        </Text>
+      <View style={[styles.container, containerInsetPadding]}>
+        <StatusBar style="dark" />
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()} style={styles.headerButton}>
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color={theme.colors.primary}
+            />
+          </Pressable>
+          <Text style={styles.headerTitle}>Structuring Concept Map</Text>
+          <View style={styles.headerPlaceholder} />
+        </View>
+
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.generatingSubtitle}>
+            {progressText ||
+              "Analyzing source materials and linking core ideas..."}
+          </Text>
+        </View>
       </View>
     );
   }
@@ -158,31 +182,36 @@ export function NotebookMindmap() {
         <StatusBar style="dark" />
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} style={styles.headerButton}>
-            <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color={theme.colors.primary}
+            />
           </Pressable>
           <Text style={styles.headerTitle}>Concept Mind Map</Text>
           <View style={styles.headerPlaceholder} />
         </View>
 
         <View style={styles.centered}>
-          <Ionicons name="git-network-outline" size={72} color={theme.colors.lightGrayIcon} />
+          <Ionicons
+            name="git-network-outline"
+            size={72}
+            color={theme.colors.lightGrayIcon}
+          />
           <Text style={styles.emptyTitle}>No Mind Map Yet</Text>
           <Text style={styles.emptySubtitle}>
             Build an interactive, zoomable network of concepts mapped
             automatically from your notebook sources.
           </Text>
           <Pressable
-            onPress={() => {
-              generateMindmapMutation.mutate();
-              router.replace(`/notebook/${id}` as any);
-              Alert.alert(
-                "Generating Mind Map",
-                "Your interactive mind map is being generated in the background. You'll receive a notification when it's ready!"
-              );
-            }}
+            onPress={handleGenerateMindmap}
             style={styles.primaryButton}
           >
-            <Ionicons name="sparkles-outline" size={18} color={theme.colors.textLight} />
+            <Ionicons
+              name="sparkles-outline"
+              size={18}
+              color={theme.colors.textLight}
+            />
             <Text style={styles.primaryButtonText}>Generate Mind Map</Text>
           </Pressable>
         </View>
@@ -211,21 +240,18 @@ export function NotebookMindmap() {
                 { text: "Cancel", style: "cancel" },
                 {
                   text: "Regenerate",
-                  onPress: () => {
-                    generateMindmapMutation.mutate();
-                    router.replace(`/notebook/${id}` as any);
-                    Alert.alert(
-                      "Generating Mind Map",
-                      "Your interactive mind map is being generated in the background. You'll receive a notification when it's ready!"
-                    );
-                  },
+                  onPress: handleGenerateMindmap,
                 },
               ],
             );
           }}
           style={styles.headerButton}
         >
-          <Ionicons name="refresh-outline" size={22} color={theme.colors.primary} />
+          <Ionicons
+            name="refresh-outline"
+            size={22}
+            color={theme.colors.primary}
+          />
         </Pressable>
       </View>
 

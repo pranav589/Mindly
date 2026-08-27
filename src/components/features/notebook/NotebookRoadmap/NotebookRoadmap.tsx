@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BottomSheet from "@/components/BottomSheet";
 import { useSSE } from "@/context/SSEContext";
 import { apiClient } from "@/services/api";
+import { useNotifications } from "@/context/NotificationContext";
 import { styles } from "./NotebookRoadmap.styles";
 
 interface RoadmapNode {
@@ -48,6 +49,8 @@ export function NotebookRoadmap() {
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
   const { lastEvent } = useSSE();
+
+  const { requestNotificationPermissions } = useNotifications();
 
   const [activeSource, setActiveSource] = useState<RoadmapNode | null>(null);
   const [sourceSheetOpen, setSourceSheetOpen] = useState(false);
@@ -117,6 +120,18 @@ export function NotebookRoadmap() {
     notebook?.roadmapStatus === "generating" ||
     generateRoadmapMutation.isPending;
 
+
+
+  const handleGenerateRoadmap = async () => {
+    await requestNotificationPermissions();
+    generateRoadmapMutation.mutate();
+    router.replace(`/notebook/${id}` as any);
+    Alert.alert(
+      "Generating Roadmap",
+      "Your personalized syllabus roadmap is being generated in the background. You'll receive a notification when it's ready!"
+    );
+  };
+
   const handleRegenerate = () => {
     Alert.alert(
       "Regenerate Roadmap",
@@ -125,14 +140,7 @@ export function NotebookRoadmap() {
         { text: "Cancel", style: "cancel" },
         {
           text: "Regenerate",
-          onPress: () => {
-            generateRoadmapMutation.mutate();
-            router.replace(`/notebook/${id}` as any);
-            Alert.alert(
-              "Generating Roadmap",
-              "Your personalized syllabus roadmap is being generated in the background. You'll receive a notification when it's ready!"
-            );
-          },
+          onPress: handleGenerateRoadmap,
         },
       ],
     );
@@ -152,13 +160,23 @@ export function NotebookRoadmap() {
 
   if (isGenerating) {
     return (
-      <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={styles.generatingTitle}>Generating Study Roadmap</Text>
-        <Text style={styles.generatingSubtitle}>
-          {progressText ||
-            "Analyzing notebook materials and mapping learning path..."}
-        </Text>
+      <View style={[styles.container, containerInsetPadding]}>
+        <StatusBar style="dark" />
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()} style={styles.headerButton}>
+            <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
+          </Pressable>
+          <Text style={styles.headerTitle}>Generating Study Roadmap</Text>
+          <View style={styles.headerPlaceholder} />
+        </View>
+
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.generatingSubtitle}>
+            {progressText ||
+              "Analyzing notebook materials and mapping learning path..."}
+          </Text>
+        </View>
       </View>
     );
   }
@@ -187,14 +205,7 @@ export function NotebookRoadmap() {
             your uploaded notebook sources.
           </Text>
           <Pressable
-            onPress={() => {
-              generateRoadmapMutation.mutate();
-              router.replace(`/notebook/${id}` as any);
-              Alert.alert(
-                "Generating Roadmap",
-                "Your personalized syllabus roadmap is being generated in the background. You'll receive a notification when it's ready!"
-              );
-            }}
+            onPress={handleGenerateRoadmap}
             style={styles.primaryButton}
           >
             <Ionicons name="sparkles-outline" size={18} color={theme.colors.textLight} />

@@ -32,12 +32,14 @@ interface NotificationContextType {
     nextReviewDate: Date,
   ) => Promise<void>;
   cancelStudyReminder: (notebookId: string) => Promise<void>;
+  requestNotificationPermissions: () => Promise<boolean>;
 }
 
 const NotificationContext = createContext<NotificationContextType>({
   sendLocalNotification: async () => undefined,
   scheduleStudyReminder: async () => {},
   cancelStudyReminder: async () => {},
+  requestNotificationPermissions: async () => false,
 });
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -59,36 +61,27 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, []);
 
-  // Request permissions and configure Android channels on mount
+  // Configure Android channels on mount if permission is already granted
   useEffect(() => {
     if (!Notifications || !isAuthenticated) return;
-    async function configureNotifications() {
-      // Request permissions
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
+    async function checkAndConfigureChannels() {
+      // Just check permissions, do NOT request them auto-prompting on login
+      const { status } = await Notifications.getPermissionsAsync();
 
-      if (finalStatus !== "granted") {
-        console.log("⚠️ Notification permissions not granted!");
-        return;
-      }
-
-      // Configure Android channel
-      if (Platform.OS === "android") {
-        await Notifications.setNotificationChannelAsync("default", {
-          name: "default",
-          importance: Notifications.AndroidImportance.MAX,
-          vibrationPattern: [0, 250, 250, 250],
-          lightColor: theme.colors.primary,
-        });
+      if (status === "granted") {
+        // Configure Android channel
+        if (Platform.OS === "android") {
+          await Notifications.setNotificationChannelAsync("default", {
+            name: "default",
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: theme.colors.primary,
+          });
+        }
       }
     }
 
-    configureNotifications();
+    checkAndConfigureChannels();
   }, [isAuthenticated]);
 
   // Listen for user tapping a notification (Deep Linking)
@@ -115,6 +108,36 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
 
     return () => subscription.remove();
   }, [router]);
+
+  const requestNotificationPermissions = async (): Promise<boolean> => {
+    if (!Notifications) return false;
+    try {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus === "granted") {
+        if (Platform.OS === "android") {
+          await Notifications.setNotificationChannelAsync("default", {
+            name: "default",
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: theme.colors.primary,
+          });
+        }
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error("Failed to request notification permissions:", err);
+      return false;
+    }
+  };
 
   // Helper to send/schedule local notification immediately
   const sendLocalNotification = async (
@@ -168,6 +191,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   ) => {
     if (!Notifications || !SecureStore) return;
     try {
+      // Contextually request/ensure permissions before scheduling
+      const hasPermission = await requestNotificationPermissions();
+      if (!hasPermission) {
+        console.log("⚠️ Cannot schedule study reminder: permissions not granted.");
+        return;
+      }
+
       // Cancel existing notification for this notebook
       await cancelStudyReminder(notebookId);
 
@@ -235,6 +265,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
         sendLocalNotification,
         scheduleStudyReminder,
         cancelStudyReminder,
+        requestNotificationPermissions,
       }}
     >
       {children}

@@ -11,6 +11,7 @@ import React, {
 } from "react";
 import { AppState } from "react-native";
 import EventSource from "react-native-sse";
+import { usePathname } from "expo-router";
 
 export type SSEStatus = "disconnected" | "connecting" | "connected";
 
@@ -60,6 +61,18 @@ function cleanError(err: string): string {
     .trim() || "An error occurred during processing.";
 }
 
+interface JobConfig {
+  displayName: string;
+  screenName: string;
+}
+
+const JOB_CONFIGS: Record<string, JobConfig> = {
+  sources: { displayName: "Source Indexing", screenName: "sources" },
+  podcast: { displayName: "AI Podcast Summary", screenName: "podcast" },
+  roadmap: { displayName: "Syllabus Roadmap", screenName: "roadmap" },
+  mindmap: { displayName: "Interactive Mind Map", screenName: "mindmap" },
+};
+
 export const SSEProvider: React.FC<{
   notebookId: string;
   children: React.ReactNode;
@@ -73,32 +86,54 @@ export const SSEProvider: React.FC<{
 
   const { sendLocalNotification } = useNotifications();
   const activeJobs = useRef<Set<string>>(new Set());
+  const notifiedJobs = useRef<Set<string>>(new Set());
+  const pathname = usePathname();
 
-  // Listen to AppState transitions
+  // Helper to map route to generic screen category
+  const getActiveScreen = (path: string) => {
+    if (!path) return "chat";
+    const jobKey = Object.keys(JOB_CONFIGS).find((key) =>
+      path.endsWith("/" + JOB_CONFIGS[key].screenName),
+    );
+    if (jobKey) return jobKey;
+    if (path.endsWith("/quiz")) return "quiz";
+    if (path.endsWith("/flashcard")) return "flashcard";
+    return "chat";
+  };
+
+  // Route-aware AppState change listener for background notifications
   useEffect(() => {
     const handleAppStateChange = (nextAppState: string) => {
-      if (
-        nextAppState === "background" &&
-        activeJobs.current.size > 0 &&
-        notebookId
-      ) {
-        const runningJobNames = Array.from(activeJobs.current).map((job) => {
-          if (job === "sources") return "Source Indexing";
-          if (job === "podcast") return "AI Podcast Summary";
-          if (job === "roadmap") return "Syllabus Roadmap";
-          if (job === "mindmap") return "Interactive Mind Map";
-          return job;
+      if (nextAppState === "background" && notebookId) {
+        const currentScreen = getActiveScreen(pathname);
+
+        // Find running jobs that are permitted to notify on the current screen and haven't notified yet
+        const jobsToNotify = Array.from(activeJobs.current).filter((job) => {
+          if (notifiedJobs.current.has(job)) return false;
+
+          const config = JOB_CONFIGS[job];
+          const isOwnScreen = config && currentScreen === config.screenName;
+
+          return currentScreen === "chat" || isOwnScreen;
         });
 
-        // Determine destination screen for the notification tap
-        const primaryJob = Array.from(activeJobs.current)[0];
-        const targetScreen = primaryJob === "sources" ? "sources" : primaryJob;
+        if (jobsToNotify.length > 0) {
+          const runningJobNames = jobsToNotify.map(
+            (job) => JOB_CONFIGS[job]?.displayName || job,
+          );
 
-        sendLocalNotification(
-          "Processing Study Materials",
-          `Mindly is compiling: ${runningJobNames.join(", ")}. We will notify you when it's ready!`,
-          { notebookId, screen: targetScreen },
-        );
+          const primaryJob = jobsToNotify[0];
+          const targetScreen = JOB_CONFIGS[primaryJob]?.screenName || primaryJob;
+
+          // Mark jobs as notified for this run
+          jobsToNotify.forEach((job) => notifiedJobs.current.add(job));
+
+          sendLocalNotification(
+            "Processing Study Materials",
+            `Mindly is compiling: ${runningJobNames.join(", ")}. We will notify you when it's ready!`,
+            { notebookId, screen: targetScreen },
+          );
+        }
       }
     };
 
@@ -107,7 +142,9 @@ export const SSEProvider: React.FC<{
       handleAppStateChange,
     );
     return () => appStateSub.remove();
-  }, [notebookId, sendLocalNotification]);
+  }, [notebookId, pathname, sendLocalNotification]);
+
+
 
   useEffect(() => {
     if (!notebookId) return;
@@ -162,6 +199,7 @@ export const SSEProvider: React.FC<{
 
           case "roadmap:progress":
             activeJobs.current.add("roadmap");
+            notifiedJobs.current.delete("roadmap");
             queryClient.setQueryData(
               ["roadmap:progress", notebookId],
               parsed.message,
@@ -170,6 +208,7 @@ export const SSEProvider: React.FC<{
 
           case "roadmap:complete":
             activeJobs.current.delete("roadmap");
+            notifiedJobs.current.delete("roadmap");
             sendLocalNotification(
               "Roadmap Generated! 🗺️",
               "Your personalized learning roadmap timeline is ready.",
@@ -182,6 +221,7 @@ export const SSEProvider: React.FC<{
 
           case "roadmap:failed":
             activeJobs.current.delete("roadmap");
+            notifiedJobs.current.delete("roadmap");
             sendLocalNotification(
               "Roadmap Generation Failed ❌",
               cleanError(parsed.error) || "Failed to generate roadmap syllabus",
@@ -191,10 +231,12 @@ export const SSEProvider: React.FC<{
 
           case "podcast:progress":
             activeJobs.current.add("podcast");
+            notifiedJobs.current.delete("podcast");
             break;
 
           case "podcast:complete":
             activeJobs.current.delete("podcast");
+            notifiedJobs.current.delete("podcast");
             sendLocalNotification(
               "Podcast Synthesized! 🎙️",
               "Your AI host overview discussion audio is ready to stream.",
@@ -207,6 +249,7 @@ export const SSEProvider: React.FC<{
 
           case "podcast:failed":
             activeJobs.current.delete("podcast");
+            notifiedJobs.current.delete("podcast");
             sendLocalNotification(
               "Podcast Synthesis Failed ❌",
               cleanError(parsed.error) || "Failed to generate podcast audio discussion",
@@ -216,10 +259,12 @@ export const SSEProvider: React.FC<{
 
           case "mindmap:progress":
             activeJobs.current.add("mindmap");
+            notifiedJobs.current.delete("mindmap");
             break;
 
           case "mindmap:complete":
             activeJobs.current.delete("mindmap");
+            notifiedJobs.current.delete("mindmap");
             sendLocalNotification(
               "Mind Map Created! 🧠",
               "Your interactive concept mind map is ready to explore.",
@@ -232,6 +277,7 @@ export const SSEProvider: React.FC<{
 
           case "mindmap:failed":
             activeJobs.current.delete("mindmap");
+            notifiedJobs.current.delete("mindmap");
             sendLocalNotification(
               "Mind Map Generation Failed ❌",
               cleanError(parsed.error) || "Failed to compile concept map",
@@ -241,6 +287,7 @@ export const SSEProvider: React.FC<{
 
           case "indexing:start":
             activeJobs.current.add("sources");
+            notifiedJobs.current.delete("sources");
             queryClient.invalidateQueries({
               queryKey: ["sources", notebookId],
             });
@@ -251,6 +298,7 @@ export const SSEProvider: React.FC<{
 
           case "indexing:complete":
             activeJobs.current.delete("sources");
+            notifiedJobs.current.delete("sources");
             sendLocalNotification(
               "Source Indexed! 📄",
               `"${parsed.sourceName || "Your document"}" has been successfully synced and is ready to study.`,
@@ -266,6 +314,7 @@ export const SSEProvider: React.FC<{
 
           case "indexing:failed":
             activeJobs.current.delete("sources");
+            notifiedJobs.current.delete("sources");
             sendLocalNotification(
               "Ingestion Failed ❌",
               `Failed to index "${parsed.sourceName || "your document"}": ${cleanError(parsed.error)}.`,

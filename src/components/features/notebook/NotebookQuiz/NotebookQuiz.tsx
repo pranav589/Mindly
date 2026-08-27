@@ -6,7 +6,8 @@ import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, AppState, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Text, View } from "react-native";
+import { useBackgroundNotification } from "@/hooks/useBackgroundNotification";
 import { styles } from "./NotebookQuiz.styles";
 import { QuizHomeView } from "./QuizHomeView/QuizHomeView";
 import { QuizQuestionView } from "./QuizQuestionView/QuizQuestionView";
@@ -46,8 +47,8 @@ export function NotebookQuiz() {
   const { id } = useLocalSearchParams();
   const queryClient = useQueryClient();
 
-  const { sendLocalNotification } = useNotifications();
-  const isGeneratingRef = useRef(false);
+  const { sendLocalNotification, requestNotificationPermissions } = useNotifications();
+
 
   // Quiz state
   const [view, setView] = useState<"home" | "quiz" | "results">("home");
@@ -57,25 +58,6 @@ export function NotebookQuiz() {
   const [isAnswered, setIsAnswered] = useState(false);
   const [userAnswers, setUserAnswers] = useState<any[]>([]);
   const [lastAttempt, setLastAttempt] = useState<Attempt | null>(null);
-
-  // Listen to AppState transitions for backgrounding notice
-  useEffect(() => {
-    const handleAppStateChange = (nextAppState: string) => {
-      if (nextAppState === "background" && isGeneratingRef.current && id) {
-        sendLocalNotification(
-          "Building Quiz Syllabus",
-          "Mindly is generating your study questions. We will notify you when it's ready!",
-          { notebookId: id, screen: "quiz" },
-        );
-      }
-    };
-
-    const appStateSub = AppState.addEventListener(
-      "change",
-      handleAppStateChange,
-    );
-    return () => appStateSub.remove();
-  }, [id, sendLocalNotification]);
 
   // ── API ──────────────────────────────────────────────────────────────────────
   const { data: quizzes = [], isLoading: isFetchingQuiz } = useQuery({
@@ -134,14 +116,12 @@ export function NotebookQuiz() {
 
   const generateQuizMutation = useMutation({
     mutationFn: async () => {
-      isGeneratingRef.current = true;
       const res = await apiClient.post(`/api/quizzes/generate`, {
         notebookId: id,
       });
       return res.data;
     },
     onSuccess: () => {
-      isGeneratingRef.current = false;
       sendLocalNotification(
         "Quiz Generated! 🧠",
         "Your study questions are ready to test your knowledge.",
@@ -150,7 +130,6 @@ export function NotebookQuiz() {
       queryClient.invalidateQueries({ queryKey: ["quizzes", id] });
     },
     onError: (err: any) => {
-      isGeneratingRef.current = false;
       const backendError = err.response?.data?.error || err.message || "Failed to generate study quiz.";
       sendLocalNotification(
         "Quiz Generation Failed ❌",
@@ -161,6 +140,14 @@ export function NotebookQuiz() {
       Alert.alert("Error", backendError);
     },
   });
+
+  useBackgroundNotification(
+    generateQuizMutation.isPending,
+    "Building Quiz Syllabus",
+    "Mindly is generating your study questions. We will notify you when it's ready!",
+    id as string,
+    "quiz"
+  );
 
   const submitAttemptMutation = useMutation({
     mutationFn: async (answers: GradedAnswer[]) => {
@@ -250,6 +237,16 @@ export function NotebookQuiz() {
     }
   };
 
+  const handleGenerateQuiz = async () => {
+    await requestNotificationPermissions();
+    generateQuizMutation.mutate();
+    router.replace(`/notebook/${id}` as any);
+    Alert.alert(
+      "Generating Quiz",
+      "Your practice quiz is being generated in the background. You'll receive a notification when it's ready!"
+    );
+  };
+
   if (isFetchingQuiz || generateQuizMutation.isPending) {
     return (
       <View style={[styles.container, styles.centered]}>
@@ -271,14 +268,7 @@ export function NotebookQuiz() {
         questions={questions}
         attempts={attempts}
         startQuiz={startQuiz}
-        onRegenerate={() => {
-          generateQuizMutation.mutate();
-          router.replace(`/notebook/${id}` as any);
-          Alert.alert(
-            "Generating Quiz",
-            "Your practice quiz is being generated in the background. You'll receive a notification when it's ready!"
-          );
-        }}
+        onRegenerate={handleGenerateQuiz}
       />
     );
   }

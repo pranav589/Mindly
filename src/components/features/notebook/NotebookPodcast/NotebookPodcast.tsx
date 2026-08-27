@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ScreenHeader from "@/components/ScreenHeader/ScreenHeader";
 import { useSSE } from "@/context/SSEContext";
 import { API_BASE_URL, apiClient } from "@/services/api";
+import { useNotifications } from "@/context/NotificationContext";
 import { styles } from "./NotebookPodcast.styles";
 import { PodcastAudioPlayer } from "./PodcastAudioPlayer/PodcastAudioPlayer";
 import { PodcastTranscript } from "./PodcastTranscript/PodcastTranscript";
@@ -37,6 +38,7 @@ export function NotebookPodcast() {
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
   const { lastEvent } = useSSE();
+  const { requestNotificationPermissions } = useNotifications();
 
   const networkState = useNetworkState();
   const isOffline = networkState.isConnected === false;
@@ -132,6 +134,22 @@ export function NotebookPodcast() {
     notebook?.podcastStatus === "generating" ||
     generatePodcastMutation.isPending;
 
+
+
+  const handleGeneratePodcast = async () => {
+    if (isOffline) {
+      Alert.alert("Offline", "Cannot generate podcasts in offline mode.");
+      return;
+    }
+    await requestNotificationPermissions();
+    generatePodcastMutation.mutate();
+    router.replace(`/notebook/${id}` as any);
+    Alert.alert(
+      "Generating Podcast",
+      "Your AI podcast discussion is being generated in the background. You'll receive a notification when it's ready!"
+    );
+  };
+
   const handleRegeneratePress = () => {
     if (isOffline) {
       Alert.alert("Offline", "Cannot regenerate podcasts in offline mode.");
@@ -144,14 +162,7 @@ export function NotebookPodcast() {
         { text: "Cancel", style: "cancel" },
         {
           text: "Regenerate",
-          onPress: () => {
-            generatePodcastMutation.mutate();
-            router.replace(`/notebook/${id}` as any);
-            Alert.alert(
-              "Generating Podcast",
-              "Your AI podcast discussion is being generated in the background. You'll receive a notification when it's ready!"
-            );
-          },
+          onPress: handleGeneratePodcast,
         },
       ],
     );
@@ -202,13 +213,16 @@ export function NotebookPodcast() {
 
   if (isGenerating) {
     return (
-      <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={styles.generatingTitle}>Structuring Audio Discussion</Text>
-        <Text style={styles.generatingSubtitle}>
-          {progressText ||
-            "Analyzing notebook materials and drafting discussion script..."}
-        </Text>
+      <View style={[styles.container, containerInsetPadding]}>
+        <StatusBar style="dark" />
+        <ScreenHeader title="Structuring Audio Discussion" />
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.generatingSubtitle}>
+            {progressText ||
+              "Analyzing notebook materials and drafting discussion script..."}
+          </Text>
+        </View>
       </View>
     );
   }
@@ -243,18 +257,7 @@ export function NotebookPodcast() {
             materials in this notebook.
           </Text>
           <Pressable
-            onPress={() => {
-              if (isOffline) {
-                Alert.alert("Offline", "Cannot generate podcasts in offline mode.");
-                return;
-              }
-              generatePodcastMutation.mutate();
-              router.replace(`/notebook/${id}` as any);
-              Alert.alert(
-                "Generating Podcast",
-                "Your AI podcast discussion is being generated in the background. You'll receive a notification when it's ready!"
-              );
-            }}
+            onPress={handleGeneratePodcast}
             style={styles.primaryButton}
           >
             <Ionicons name="sparkles-outline" size={18} color={theme.colors.textLight} />
