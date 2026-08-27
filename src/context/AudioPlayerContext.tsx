@@ -23,6 +23,7 @@ interface AudioPlayerContextType {
     title: string,
     subtitle: string,
     notebookId: string,
+    shouldPlay?: boolean,
   ) => void;
   play: () => void;
   pause: () => void;
@@ -66,6 +67,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     title: string,
     subtitle: string,
     notebookId: string,
+    shouldPlay: boolean = true,
   ) => {
     try {
       // Configure audio mode for background playback
@@ -77,9 +79,10 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setTrackInfo({ url, title, subtitle, notebookId });
       player.replace({ uri: url });
-      
-      // Start playback first
-      player.play();
+
+      if (shouldPlay) {
+        player.play();
+      }
 
       // Delay registering lock screen controls to ensure the audio session is fully active
       setTimeout(() => {
@@ -88,7 +91,9 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({
             title,
             artist: subtitle,
           });
-          console.log("⚡ [AudioPlayerContext] Registered lock screen metadata successfully");
+          console.log(
+            "⚡ [AudioPlayerContext] Registered lock screen metadata successfully",
+          );
         } catch (err) {
           console.error("Failed to set active for lock screen:", err);
         }

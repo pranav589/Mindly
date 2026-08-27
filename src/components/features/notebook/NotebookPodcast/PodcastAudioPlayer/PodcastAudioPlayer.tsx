@@ -1,9 +1,9 @@
+import { useGlobalAudioPlayer } from "@/context/AudioPlayerContext";
 import { theme } from "@/theme/themes";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { useLocalSearchParams } from "expo-router";
-import { useGlobalAudioPlayer } from "@/context/AudioPlayerContext";
 import { styles } from "./PodcastAudioPlayer.styles";
 
 interface PodcastAudioPlayerProps {
@@ -29,17 +29,6 @@ export function PodcastAudioPlayer({ fullAudioUrl }: PodcastAudioPlayerProps) {
 
   const waveformBarsCount = 36;
   const [heights, setHeights] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (!trackInfo || trackInfo.url !== fullAudioUrl) {
-      loadTrack(
-        fullAudioUrl,
-        "Overview Podcast",
-        "AI-generated discussion",
-        notebookId,
-      );
-    }
-  }, [fullAudioUrl, trackInfo, notebookId]);
 
   useEffect(() => {
     const initialHeights = Array.from({ length: waveformBarsCount }).map(
@@ -68,7 +57,17 @@ export function PodcastAudioPlayer({ fullAudioUrl }: PodcastAudioPlayerProps) {
     if (isPlaying) {
       pause();
     } else {
-      play();
+      if (!trackInfo || trackInfo.url !== fullAudioUrl) {
+        loadTrack(
+          fullAudioUrl,
+          "Overview Podcast",
+          "AI-generated discussion",
+          notebookId,
+          true,
+        );
+      } else {
+        play();
+      }
     }
   };
 
@@ -159,7 +158,11 @@ export function PodcastAudioPlayer({ fullAudioUrl }: PodcastAudioPlayerProps) {
           {/* Central controls */}
           <View style={styles.centralControls}>
             <Pressable onPress={() => handleSkip(-10)}>
-              <MaterialIcons name="replay-10" size={32} color={theme.colors.textLight} />
+              <MaterialIcons
+                name="replay-10"
+                size={32}
+                color={theme.colors.textLight}
+              />
             </Pressable>
 
             <Pressable onPress={handlePlayPause} style={styles.playButtonGlow}>
@@ -167,12 +170,18 @@ export function PodcastAudioPlayer({ fullAudioUrl }: PodcastAudioPlayerProps) {
                 name={isPlaying ? "pause" : "play"}
                 size={28}
                 color={theme.colors.textLight}
-                style={isPlaying ? styles.playIconNoOffset : styles.playIconOffset}
+                style={
+                  isPlaying ? styles.playIconNoOffset : styles.playIconOffset
+                }
               />
             </Pressable>
 
             <Pressable onPress={() => handleSkip(10)}>
-              <MaterialIcons name="forward-10" size={32} color={theme.colors.textLight} />
+              <MaterialIcons
+                name="forward-10"
+                size={32}
+                color={theme.colors.textLight}
+              />
             </Pressable>
           </View>
 

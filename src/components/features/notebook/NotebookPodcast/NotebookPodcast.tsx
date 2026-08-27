@@ -316,21 +316,21 @@ export function NotebookPodcast() {
             <Pressable
               onPress={handleDownload}
               disabled={downloading}
-              style={[styles.primaryButton, { marginTop: 12, width: "100%", height: 42, justifyContent: "center" }]}
+              style={[styles.primaryButton, styles.downloadButton]}
             >
               {downloading ? (
-                <ActivityIndicator size="small" color="#ffffff" />
+                <ActivityIndicator size="small" color={theme.colors.textLight} />
               ) : (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Ionicons name="download-outline" size={18} color="#ffffff" style={{ marginRight: 6 }} />
+                <View style={styles.downloadRow}>
+                  <Ionicons name="download-outline" size={18} color={theme.colors.textLight} style={styles.downloadIcon} />
                   <Text style={styles.primaryButtonText}>Download for Offline Listening</Text>
                 </View>
               )}
             </Pressable>
           ) : (
-            <View style={{ flexDirection: "row", alignItems: "center", marginTop: 12 }}>
-              <Ionicons name="checkmark-circle" size={18} color="#10b981" />
-              <Text style={{ marginLeft: 6, color: "#10b981", fontWeight: "600", fontSize: 13 }}>
+            <View style={styles.savedOfflineRow}>
+              <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />
+              <Text style={styles.savedOfflineText}>
                 Saved Offline
               </Text>
             </View>
