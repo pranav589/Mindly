@@ -21,6 +21,7 @@ import {
 } from "react-native";
 import { useCustomAlert } from "@/context/CustomAlertContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useDebounce } from "@/hooks/useDebounce";
 import { getStyles } from "./DashboardScreen.styles";
 
 export default function DashboardScreen() {
@@ -31,6 +32,7 @@ export default function DashboardScreen() {
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 400);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const { showAlert } = useCustomAlert();
   const [newNotebookName, setNewNotebookName] = useState("");
@@ -39,10 +41,13 @@ export default function DashboardScreen() {
   );
 
   const { data: notebooks = [] } = useQuery({
-    queryKey: ["notebooks"],
+    queryKey: ["notebooks", debouncedSearchQuery],
     queryFn: async () => {
       try {
-        const response = await apiClient.get<any[]>("/api/notebooks");
+        const url = debouncedSearchQuery
+          ? `/api/notebooks?q=${encodeURIComponent(debouncedSearchQuery)}`
+          : "/api/notebooks";
+        const response = await apiClient.get<any[]>(url);
         const list = response.data;
         for (const nb of list) {
           await offlineCache.cacheNotebook(nb._id, nb.name || "Notebook");
@@ -51,11 +56,18 @@ export default function DashboardScreen() {
       } catch (err) {
         const cached = await offlineCache.getCachedNotebooks();
         if (cached && cached.length > 0) {
-          return cached.map((c) => ({
+          let mapped = cached.map((c) => ({
             _id: c.notebookId,
             name: c.title,
             isOfflineOnly: true,
           }));
+          if (debouncedSearchQuery) {
+            const queryLower = debouncedSearchQuery.toLowerCase();
+            mapped = mapped.filter((item) =>
+              item.name.toLowerCase().includes(queryLower),
+            );
+          }
+          return mapped;
         }
         throw err;
       }
