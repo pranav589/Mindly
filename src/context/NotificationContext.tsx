@@ -168,16 +168,23 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const cancelStudyReminder = async (notebookId: string) => {
-    if (!Notifications || !SecureStore) return;
+    if (!Notifications) return;
     try {
-      const key = `study_reminder_${notebookId}`;
-      const scheduledId = await SecureStore.getItemAsync(key);
-      if (scheduledId) {
-        await Notifications.cancelScheduledNotificationAsync(scheduledId);
+      // Query all scheduled notifications directly from the OS (Source of Truth)
+      const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+      for (const n of scheduled) {
+        if (n.content.data?.notebookId === notebookId) {
+          await Notifications.cancelScheduledNotificationAsync(n.identifier);
+          console.log(
+            `Cancelled study reminder notification ${n.identifier} for notebook: ${notebookId}`,
+          );
+        }
+      }
+
+      // Fallback: Clean up SecureStore record
+      if (SecureStore) {
+        const key = `study_reminder_${notebookId}`;
         await SecureStore.deleteItemAsync(key);
-        console.log(
-          `Cancelled study reminder notification for notebook: ${notebookId}`,
-        );
       }
     } catch (err) {
       console.error("Failed to cancel study reminder:", err);
