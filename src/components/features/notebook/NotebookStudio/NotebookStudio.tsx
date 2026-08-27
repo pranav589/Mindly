@@ -1,3 +1,4 @@
+import { useCustomAlert } from "@/context/CustomAlertContext";
 import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -11,6 +12,7 @@ export function NotebookStudio() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const insets = useSafeAreaInsets();
+  const { showAlert } = useCustomAlert();
 
   const studioTools = [
     {
@@ -73,9 +75,15 @@ export function NotebookStudio() {
         >
           <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
         </Pressable>
-        <Text style={styles.headerTitle}>Study Studio Hub</Text>
+        <Text style={styles.headerTitle}>Studio Hub</Text>
         <Pressable
-          onPress={() => alert("Invite collaborators")}
+          onPress={() =>
+            showAlert({
+              title: "Coming Soon",
+              message: "Collaboration features are coming soon!",
+              type: "info",
+            })
+          }
           style={({ pressed }) => [
             styles.inviteButton,
             pressed && styles.pressedOpacity,

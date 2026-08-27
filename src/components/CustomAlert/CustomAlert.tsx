@@ -62,6 +62,14 @@ export function CustomAlert({ visible, options, onClose }: CustomAlertProps) {
     : [{ text: "OK", style: "default" as const }];
 
   const isTwoButtons = alertButtons.length === 2;
+
+  // Sort buttons: Cancel goes left in horizontal, bottom in vertical stack
+  const cancelBtn = alertButtons.find((b) => b.style === "cancel");
+  const otherBtns = alertButtons.filter((b) => b.style !== "cancel");
+  const sortedButtons = isTwoButtons
+    ? (cancelBtn ? [cancelBtn, ...otherBtns] : alertButtons)
+    : (cancelBtn ? [...otherBtns, cancelBtn] : alertButtons);
+
   const buttonContainerStyle = isTwoButtons
     ? styles.horizontalButtons
     : styles.verticalButtons;
@@ -92,7 +100,7 @@ export function CustomAlert({ visible, options, onClose }: CustomAlertProps) {
 
           {/* Button Layout */}
           <View style={buttonContainerStyle}>
-            {alertButtons.map((btn, index) => {
+            {sortedButtons.map((btn, index) => {
               const isCancel = btn.style === "cancel";
               const isDestructive = btn.style === "destructive";
 

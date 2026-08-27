@@ -49,10 +49,15 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     color: theme.colors.textHeading,
   },
-  selectText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: theme.colors.primary,
+  sectionAddButton: {
+    padding: 6,
+    borderRadius: 8,
+    backgroundColor: "rgba(17, 120, 100, 0.08)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  sectionAddButtonPressed: {
+    opacity: 0.7,
   },
   sourcesList: {
     gap: 12,

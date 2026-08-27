@@ -525,7 +525,11 @@ export function NotebookChat() {
               <Pressable
                 onPress={() => {
                   setCitationSheetOpen(false);
-                  alert("Opening full source reader...");
+                  showAlert({
+                    title: "Coming Soon",
+                    message: "The full source reader is coming soon!",
+                    type: "info",
+                  });
                 }}
                 style={({ pressed }) => [
                   styles.citationPrimaryButton,
@@ -589,7 +593,7 @@ export function NotebookChat() {
             />
           </Pressable>
 
-          {/* Option: Audio Studio */}
+          {/* Option: Studio Hub */}
           <Pressable
             onPress={() => {
               setMenuSheetOpen(false);
@@ -608,9 +612,9 @@ export function NotebookChat() {
               />
             </View>
             <View style={styles.menuTextContainer}>
-              <Text style={styles.menuItemTitle}>Audio Studio</Text>
+              <Text style={styles.menuItemTitle}>Studio Hub</Text>
               <Text style={styles.menuItemSubtitle}>
-                Listen to AI-generated podcasts & overviews
+                Generate podcasts, quizzes, flashcards, mindmaps & roadmaps
               </Text>
             </View>
             <Ionicons
@@ -625,7 +629,11 @@ export function NotebookChat() {
             onPress={() => {
               setMenuSheetOpen(false);
               setTimeout(() => {
-                alert("Invite collaborators");
+                showAlert({
+                  title: "Coming Soon",
+                  message: "Collaboration features are coming soon!",
+                  type: "info",
+                });
               }, 300);
             }}
             style={({ pressed }) => [

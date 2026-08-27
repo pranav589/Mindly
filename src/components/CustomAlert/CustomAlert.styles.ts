@@ -71,7 +71,7 @@ export const styles = StyleSheet.create({
   button: {
     flex: 1,
     height: 48,
-    borderRadius: 12,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 16,
@@ -79,7 +79,7 @@ export const styles = StyleSheet.create({
   buttonFullWidth: {
     width: "100%",
     height: 48,
-    borderRadius: 12,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 16,
@@ -88,9 +88,7 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   cancelButton: {
-    backgroundColor: theme.colors.gray100,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    backgroundColor: "rgba(17, 120, 100, 0.05)",
   },
   destructiveButton: {
     backgroundColor: theme.colors.textError,
@@ -101,7 +99,7 @@ export const styles = StyleSheet.create({
     fontSize: 15,
   },
   cancelButtonText: {
-    color: theme.colors.gray500,
+    color: theme.colors.textSecondary,
     fontWeight: "600",
     fontSize: 15,
   },

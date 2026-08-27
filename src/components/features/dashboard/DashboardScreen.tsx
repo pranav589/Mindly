@@ -1,4 +1,7 @@
 import BottomSheet from "@/components/BottomSheet";
+import { useCustomAlert } from "@/context/CustomAlertContext";
+import { useAuth } from "@/hooks/useAuth";
+import { useDebounce } from "@/hooks/useDebounce";
 import { apiClient } from "@/services/api";
 import { offlineCache } from "@/services/offlineCache";
 import { theme } from "@/theme/themes";
@@ -19,16 +22,55 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useCustomAlert } from "@/context/CustomAlertContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useDebounce } from "@/hooks/useDebounce";
 import { getStyles } from "./DashboardScreen.styles";
+
+interface BottomSheetItem {
+  id: string;
+  title: string;
+  icon: React.ComponentProps<typeof Ionicons>["name"] | string;
+  isPrimary?: boolean;
+  disabled?: boolean;
+  actionType: "create" | "coming_soon";
+}
+
+const DRAWER_ITEMS: BottomSheetItem[] = [
+  {
+    id: "new-blank",
+    title: "New Blank Notebook",
+    icon: "document-text-outline",
+    isPrimary: true,
+    actionType: "create",
+  },
+  {
+    id: "import-drive",
+    title: "Import from Drive",
+    icon: "cloud-upload-outline",
+    disabled: true,
+    actionType: "coming_soon",
+  },
+  {
+    id: "scan-document",
+    title: "Scan Document",
+    icon: "scan-outline",
+    disabled: true,
+    actionType: "coming_soon",
+  },
+  {
+    id: "share-workspace",
+    title: "Share Workspace",
+    icon: "share-social-outline",
+    disabled: true,
+    actionType: "coming_soon",
+  },
+];
 
 export default function DashboardScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
   const styles = getStyles(insets);
+  const { user } = useAuth();
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -119,6 +161,10 @@ export default function DashboardScreen() {
     createNotebookMutation.mutate(trimmedName);
   };
 
+  const defaultAvatar =
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
+  const userAvatar = user?.avatarUrl || defaultAvatar;
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -128,34 +174,23 @@ export default function DashboardScreen() {
         <View style={styles.profileContainer}>
           <Image
             source={{
-              uri: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
+              uri: userAvatar,
             }}
             style={styles.profileImage}
           />
           <View>
             <Text style={styles.workspaceText}>Workspace</Text>
-            <Pressable style={styles.workspaceSelector}>
-              <Text style={styles.workspaceType}>Personal</Text>
-              <Ionicons
-                name="chevron-down"
-                size={14}
-                color={theme.colors.textSecondary}
-              />
-            </Pressable>
+            <Text style={styles.workspaceType}>{user?.name}</Text>
           </View>
         </View>
-
         <Pressable
+          onPress={() => setDrawerVisible(true)}
           style={({ pressed }) => [
-            styles.headerSearchButton,
-            { opacity: pressed ? 0.7 : 1 },
+            styles.headerAddButton,
+            pressed && styles.headerAddButtonPressed,
           ]}
         >
-          <Ionicons
-            name="search-outline"
-            size={22}
-            color={theme.colors.primaryDark}
-          />
+          <Ionicons name="add" size={24} color={theme.colors.primary} />
         </Pressable>
       </View>
 
@@ -191,18 +226,6 @@ export default function DashboardScreen() {
         {/* RECENT NOTEBOOKS SECTION */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Recent Notebooks</Text>
-          <Pressable
-            style={({ pressed }) => [
-              styles.filterButton,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
-          >
-            <Ionicons
-              name="filter-outline"
-              size={20}
-              color={theme.colors.textSecondary}
-            />
-          </Pressable>
         </View>
 
         {/* Notebooks Grid */}
@@ -290,91 +313,51 @@ export default function DashboardScreen() {
         onClose={() => setDrawerVisible(false)}
         title="Create New"
       >
-        {/* Action Buttons */}
-        <Pressable
-          onPress={() => {
-            setDrawerVisible(false);
-            handleCreateNotebook();
-          }}
-          style={({ pressed }) => [
-            styles.drawerItem,
-            pressed && styles.drawerItemPressed,
-          ]}
-        >
-          <View
-            style={[
-              styles.drawerItemIconContainer,
-              styles.drawerItemIconContainerPrimary,
-            ]}
-          >
-            <Ionicons
-              name="document-text-outline"
-              size={20}
-              color={theme.colors.primary}
-            />
-          </View>
-          <Text style={styles.drawerItemText}>New Blank Notebook</Text>
-        </Pressable>
-
-        <Pressable
-          onPress={() => {
-            setDrawerVisible(false);
-            alert("Importing...");
-          }}
-          style={({ pressed }) => [
-            styles.drawerItem,
-            pressed && styles.drawerItemPressed,
-          ]}
-        >
-          <View style={styles.drawerItemIconContainer}>
-            <Ionicons
-              name="cloud-upload-outline"
-              size={20}
-              color={theme.colors.textSecondary}
-            />
-          </View>
-          <Text style={styles.drawerItemText}>Import from Drive</Text>
-        </Pressable>
-
-        <Pressable
-          onPress={() => {
-            setDrawerVisible(false);
-            alert("Scanning...");
-          }}
-          style={({ pressed }) => [
-            styles.drawerItem,
-            pressed && styles.drawerItemPressed,
-          ]}
-        >
-          <View style={styles.drawerItemIconContainer}>
-            <Ionicons
-              name="scan-outline"
-              size={20}
-              color={theme.colors.textSecondary}
-            />
-          </View>
-          <Text style={styles.drawerItemText}>Scan Document</Text>
-        </Pressable>
-
-        <Pressable
-          onPress={() => {
-            setDrawerVisible(false);
-            alert("Sharing...");
-          }}
-          style={({ pressed }) => [
-            styles.drawerItem,
-            pressed && styles.drawerItemPressed,
-          ]}
-        >
-          <View style={styles.drawerItemIconContainer}>
-            <Ionicons
-              name="share-social-outline"
-              size={20}
-              color={theme.colors.textSecondary}
-            />
-          </View>
-          <Text style={styles.drawerItemText}>Share Workspace</Text>
-        </Pressable>
+        {DRAWER_ITEMS.map((item) => {
+          const isCreate = item.actionType === "create";
+          return (
+            <Pressable
+              key={item.id}
+              disabled={item.disabled}
+              onPress={
+                isCreate
+                  ? () => {
+                      setDrawerVisible(false);
+                      handleCreateNotebook();
+                    }
+                  : undefined
+              }
+              style={({ pressed }) => [
+                styles.drawerItem,
+                item.disabled && styles.drawerItemDisabled,
+                pressed && !item.disabled && styles.drawerItemPressed,
+              ]}
+            >
+              <View
+                style={[
+                  styles.drawerItemIconContainer,
+                  item.isPrimary && styles.drawerItemIconContainerPrimary,
+                ]}
+              >
+                <Ionicons
+                  name={item.icon as any}
+                  size={20}
+                  color={
+                    item.isPrimary
+                      ? theme.colors.primary
+                      : theme.colors.textMuted
+                  }
+                />
+              </View>
+              <Text style={styles.drawerItemText}>{item.title}</Text>
+              {item.disabled && (
+                <View style={styles.badgeContainer}>
+                  <Text style={styles.badgeText}>Coming Soon</Text>
+                </View>
+              )}
+            </Pressable>
+          );
+        })}
       </BottomSheet>
 
       {/* CREATE NOTEBOOK MODAL */}

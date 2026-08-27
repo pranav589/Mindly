@@ -1,19 +1,29 @@
+import ScreenHeader from "@/components/ScreenHeader/ScreenHeader";
+import { useCustomAlert } from "@/context/CustomAlertContext";
+import { useNotifications } from "@/context/NotificationContext";
+import { useSSE } from "@/context/SSEContext";
+import { API_BASE_URL, apiClient } from "@/services/api";
+import { offlineCache } from "@/services/offlineCache";
 import { theme } from "@/theme/themes";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  documentDirectory,
+  downloadAsync,
+  getInfoAsync,
+} from "expo-file-system/legacy";
+import { useNetworkState } from "expo-network";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { documentDirectory, downloadAsync, getInfoAsync } from "expo-file-system/legacy";
-import { useNetworkState } from "expo-network";
-import { offlineCache } from "@/services/offlineCache";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import ScreenHeader from "@/components/ScreenHeader/ScreenHeader";
-import { useSSE } from "@/context/SSEContext";
-import { API_BASE_URL, apiClient } from "@/services/api";
-import { useNotifications } from "@/context/NotificationContext";
-import { useCustomAlert } from "@/context/CustomAlertContext";
 import { styles } from "./NotebookPodcast.styles";
 import { PodcastAudioPlayer } from "./PodcastAudioPlayer/PodcastAudioPlayer";
 import { PodcastTranscript } from "./PodcastTranscript/PodcastTranscript";
@@ -78,7 +88,10 @@ export function NotebookPodcast() {
           );
           const nb = res.data.notebook;
           if (id && nb) {
-            await offlineCache.cacheNotebook(id as string, nb.name || "Notebook");
+            await offlineCache.cacheNotebook(
+              id as string,
+              nb.name || "Notebook",
+            );
           }
           return nb;
         } catch (err) {
@@ -87,7 +100,9 @@ export function NotebookPodcast() {
             const match = cachedList.find((n) => n.notebookId === id);
             if (match) {
               // Try to populate cached script
-              const cachedPodcast = await offlineCache.getCachedPodcast(id as string);
+              const cachedPodcast = await offlineCache.getCachedPodcast(
+                id as string,
+              );
               return {
                 _id: match.notebookId,
                 name: match.title,
@@ -124,10 +139,15 @@ export function NotebookPodcast() {
       queryClient.invalidateQueries({ queryKey: ["notebook", id] });
     },
     onError: (err: any) => {
-      console.warn("Podcast generation error:", err?.response?.data?.error || err.message);
+      console.warn(
+        "Podcast generation error:",
+        err?.response?.data?.error || err.message,
+      );
       showAlert({
         title: "Error",
-        message: err?.response?.data?.error ?? "Failed to initiate podcast generation.",
+        message:
+          err?.response?.data?.error ??
+          "Failed to initiate podcast generation.",
         type: "error",
       });
     },
@@ -136,8 +156,6 @@ export function NotebookPodcast() {
   const isGenerating =
     notebook?.podcastStatus === "generating" ||
     generatePodcastMutation.isPending;
-
-
 
   const handleGeneratePodcast = async () => {
     if (isOffline) {
@@ -153,7 +171,8 @@ export function NotebookPodcast() {
     router.replace(`/notebook/${id}` as any);
     showAlert({
       title: "Generating Podcast",
-      message: "Your AI podcast discussion is being generated in the background. You'll receive a notification when it's ready!",
+      message:
+        "Your AI podcast discussion is being generated in the background. You'll receive a notification when it's ready!",
       type: "info",
     });
   };
@@ -169,7 +188,8 @@ export function NotebookPodcast() {
     }
     showAlert({
       title: "Regenerate Podcast",
-      message: "This will generate a new host script and rebuild the audio dialogue files. Continue?",
+      message:
+        "This will generate a new host script and rebuild the audio dialogue files. Continue?",
       type: "warning",
       buttons: [
         { text: "Cancel", style: "cancel" },
@@ -196,7 +216,7 @@ export function NotebookPodcast() {
         await offlineCache.cachePodcast(
           id as string,
           result.uri,
-          notebook.podcast.script || []
+          notebook.podcast.script || [],
         );
         setLocalUri(result.uri);
         setLocalScript(notebook.podcast.script || []);
@@ -254,10 +274,15 @@ export function NotebookPodcast() {
         <StatusBar style="dark" />
         <ScreenHeader title="Audio Overview" />
         <View style={styles.centered}>
-          <Ionicons name="wifi-outline" size={72} color={theme.colors.lightGrayIcon} />
+          <Ionicons
+            name="wifi-outline"
+            size={72}
+            color={theme.colors.lightGrayIcon}
+          />
           <Text style={styles.emptyTitle}>Offline Mode</Text>
           <Text style={styles.emptySubtitle}>
-            This podcast has not been downloaded yet. Connect to the internet to listen to it.
+            This podcast has not been downloaded yet. Connect to the internet to
+            listen to it.
           </Text>
         </View>
       </View>
@@ -271,7 +296,11 @@ export function NotebookPodcast() {
         <ScreenHeader title="Audio Overview" />
 
         <View style={styles.centered}>
-          <Ionicons name="mic-outline" size={72} color={theme.colors.lightGrayIcon} />
+          <Ionicons
+            name="mic-outline"
+            size={72}
+            color={theme.colors.lightGrayIcon}
+          />
           <Text style={styles.emptyTitle}>No Audio Overview Yet</Text>
           <Text style={styles.emptySubtitle}>
             Generate an AI conversational podcast dialog summarizing the
@@ -281,7 +310,11 @@ export function NotebookPodcast() {
             onPress={handleGeneratePodcast}
             style={styles.primaryButton}
           >
-            <Ionicons name="sparkles-outline" size={18} color={theme.colors.textLight} />
+            <Ionicons
+              name="sparkles-outline"
+              size={18}
+              color={theme.colors.textLight}
+            />
             <Text style={styles.primaryButtonText}>
               Generate Audio Overview
             </Text>
@@ -294,9 +327,9 @@ export function NotebookPodcast() {
   const audioUrl = notebook.podcast.audioUrl;
   const fullAudioUrl = localUri
     ? localUri
-    : (audioUrl.startsWith("http")
+    : audioUrl.startsWith("http")
       ? audioUrl
-      : `${API_BASE_URL}${audioUrl}`);
+      : `${API_BASE_URL}${audioUrl}`;
 
   const script = notebook.podcast.script || localScript || [];
 
@@ -322,8 +355,15 @@ export function NotebookPodcast() {
               <Text style={styles.tagText}>{notebook.name}</Text>
             </View>
             {localUri && (
-              <View style={[styles.tag, { backgroundColor: "rgba(16, 185, 129, 0.15)" }]}>
-                <Text style={[styles.tagText, { color: "#10b981" }]}>💾 Offline Ready</Text>
+              <View
+                style={[
+                  styles.tag,
+                  { backgroundColor: "rgba(16, 185, 129, 0.15)" },
+                ]}
+              >
+                <Text style={[styles.tagText, { color: "#10b981" }]}>
+                  💾 Offline Ready
+                </Text>
               </View>
             )}
           </View>
@@ -340,20 +380,32 @@ export function NotebookPodcast() {
               style={[styles.primaryButton, styles.downloadButton]}
             >
               {downloading ? (
-                <ActivityIndicator size="small" color={theme.colors.textLight} />
+                <ActivityIndicator
+                  size="small"
+                  color={theme.colors.textLight}
+                />
               ) : (
                 <View style={styles.downloadRow}>
-                  <Ionicons name="download-outline" size={18} color={theme.colors.textLight} style={styles.downloadIcon} />
-                  <Text style={styles.primaryButtonText}>Download for Offline Listening</Text>
+                  <Ionicons
+                    name="download-outline"
+                    size={18}
+                    color={theme.colors.textLight}
+                    style={styles.downloadIcon}
+                  />
+                  <Text style={styles.primaryButtonText}>
+                    Download for Offline Listening
+                  </Text>
                 </View>
               )}
             </Pressable>
           ) : (
             <View style={styles.savedOfflineRow}>
-              <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />
-              <Text style={styles.savedOfflineText}>
-                Saved Offline
-              </Text>
+              <Ionicons
+                name="checkmark-circle"
+                size={18}
+                color={theme.colors.success}
+              />
+              <Text style={styles.savedOfflineText}>Saved Offline</Text>
             </View>
           )}
         </View>

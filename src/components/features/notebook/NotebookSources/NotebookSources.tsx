@@ -76,7 +76,7 @@ export function NotebookSources() {
       queryClient.invalidateQueries({ queryKey: ["notebook", id] });
       showAlert({
         title: "Success",
-        message: "Source queued for re-indexing!",
+        message: "Source queued for sync!",
         type: "success",
       });
     },
@@ -84,7 +84,7 @@ export function NotebookSources() {
       console.error(err);
       showAlert({
         title: "Error",
-        message: err.response?.data?.error || "Failed to re-index source",
+        message: err.response?.data?.error || "Failed to sync source",
         type: "error",
       });
     },
@@ -100,7 +100,7 @@ export function NotebookSources() {
       buttons: [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Re-index (Sync to Vector DB)",
+          text: "Sync Source",
           onPress: () => reindexSourceMutation.mutate(source._id),
         },
         {
@@ -170,7 +170,13 @@ export function NotebookSources() {
             />
           </Pressable>
           <Pressable
-            onPress={() => alert("Invite collaborators")}
+            onPress={() =>
+              showAlert({
+                title: "Coming Soon",
+                message: "Collaboration features are coming soon!",
+                type: "info",
+              })
+            }
             style={({ pressed }) => [
               styles.headerButton,
               { opacity: pressed ? 0.7 : 1 },
@@ -189,8 +195,14 @@ export function NotebookSources() {
       >
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Sources</Text>
-          <Pressable onPress={() => alert("Select mode")}>
-            <Text style={styles.selectText}>Select</Text>
+          <Pressable
+            onPress={() => setDrawerVisible(true)}
+            style={({ pressed }) => [
+              styles.sectionAddButton,
+              pressed && styles.sectionAddButtonPressed,
+            ]}
+          >
+            <Ionicons name="add" size={20} color={theme.colors.primary} />
           </Pressable>
         </View>
 

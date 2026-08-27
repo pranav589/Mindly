@@ -59,9 +59,7 @@ export function SourceCard({ source, onLongPress }: SourceCardProps) {
         <ActivityIndicator size="small" color={theme.colors.primary} />
       ) : source.status === "failed" ? (
         <Ionicons name="close-circle" size={20} color={theme.colors.textError} />
-      ) : (
-        <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
-      )}
+      ) : null}
     </Pressable>
   );
 }
