@@ -5,6 +5,8 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { loadStoredTokens } from "@/services/api";
+import { onlineManager } from "@tanstack/react-query";
+import * as Network from "expo-network";
 
 WebBrowser.maybeCompleteAuthSession();
 import { AuthProvider } from "@/context/AuthContext";
@@ -24,6 +26,23 @@ export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    // Configure React Query online manager with expo-network
+    onlineManager.setEventListener((setOnline) => {
+      const checkState = async () => {
+        try {
+          const state = await Network.getNetworkStateAsync();
+          setOnline(state.isConnected !== false);
+        } catch (_) {}
+      };
+
+      checkState();
+      const interval = setInterval(checkState, 3000);
+
+      return () => {
+        clearInterval(interval);
+      };
+    });
+
     Promise.all([
       loadStoredTokens(),
       initializeDatabase().catch((e) => console.error("DB init failed:", e)),

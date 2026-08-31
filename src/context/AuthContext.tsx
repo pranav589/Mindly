@@ -1,10 +1,11 @@
-import { apiClient, setAuthTokens } from "@/services/api";
+import { apiClient, setAuthTokens, getAuthToken } from "@/services/api";
 import { getGoogleAuthUrl } from "@/services/oauth";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { useCustomAlert } from "@/context/CustomAlertContext";
+import * as SecureStore from "expo-secure-store";
 
 export interface User {
   _id: string;
@@ -32,6 +33,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const queryClient = useQueryClient();
   const { showAlert } = useCustomAlert();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [cachedUser, setCachedUser] = useState<User | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  // Load user profile from SecureStore on startup
+  useEffect(() => {
+    const loadCachedProfile = async () => {
+      try {
+        const profileStr = await SecureStore.getItemAsync("userProfile");
+        if (profileStr) {
+          setCachedUser(JSON.parse(profileStr));
+        }
+      } catch (err) {
+        console.error("[AuthContext] Failed to load cached user profile:", err);
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+    loadCachedProfile();
+  }, []);
 
   // TanStack Query to fetch current user profile
   const {
@@ -43,9 +63,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     queryFn: async () => {
       try {
         const response = await apiClient.get<{ user: User }>("/api/auth/me");
-        return response.data.user;
+        const freshUser = response.data.user;
+        await SecureStore.setItemAsync("userProfile", JSON.stringify(freshUser));
+        setCachedUser(freshUser);
+        return freshUser;
       } catch (err) {
         console.error("[AuthContext] authMe query failed:", err);
+        const hasToken = getAuthToken();
+        if (hasToken && cachedUser) {
+          console.log("[AuthContext] Network call failed but token and cached user profile exist. Returning cache.");
+          return cachedUser;
+        }
         return null;
       }
     },
@@ -98,11 +126,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     },
     onSuccess: () => {
       setAuthTokens(null, null);
+      SecureStore.deleteItemAsync("userProfile").catch(() => {});
+      setCachedUser(null);
       queryClient.setQueryData(["authMe"], null);
     },
     onError: () => {
       // Wiping locally even if server logout fails (standard security practice)
       setAuthTokens(null, null);
+      SecureStore.deleteItemAsync("userProfile").catch(() => {});
+      setCachedUser(null);
       queryClient.setQueryData(["authMe"], null);
     },
   });
@@ -111,13 +143,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     await logoutMutation.mutateAsync();
   };
 
-  const isLoading = isFetchingUser || isLoggingIn;
+  const isLoading = isFetchingUser || isLoggingIn || isInitializing;
 
   return (
     <AuthContext.Provider
       value={{
-        user: user || null,
-        isAuthenticated: !!user,
+        user: user || cachedUser || null,
+        isAuthenticated: !!(user || cachedUser),
         isLoading,
         loginWithGoogle,
         logout,
