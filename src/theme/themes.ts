@@ -64,6 +64,16 @@ export const theme = {
     highlightBg: "rgba(218, 247, 166, 0.4)",
     highlightText: "#131f00",
     immersiveBackground: "#191c1d",
+    
+    // Generic Light/Pastel Theme Colors
+    greenLight: "#ecf4f2",
+    greenLightIcon: "#dbebe7",
+    yellowLight: "#fafdf1",
+    yellowLightIcon: "#f2fcdd",
+    blueLight: "#eff5fe",
+    blueLightIcon: "#e1ecfd",
+    orangeLight: "#fef7eb",
+    orangeLightIcon: "#fdf0da",
   },
   spacing: {
     xs: 4,

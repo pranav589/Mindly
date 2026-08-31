@@ -1,4 +1,5 @@
 import BottomSheet from "@/components/BottomSheet";
+import { useCustomAlert } from "@/context/CustomAlertContext";
 import { useSSE } from "@/context/SSEContext";
 import { apiClient } from "@/services/api";
 import { theme } from "@/theme/themes";
@@ -27,11 +28,41 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useCustomAlert } from "@/context/CustomAlertContext";
 import { MessageRow } from "./MessageRow/MessageRow";
 import { styles } from "./NotebookChat.styles";
 import { CitationData, Message } from "./types";
 import { TypingRow } from "./TypingRow/TypingRow";
+
+const EMPTY_STATE = [
+  {
+    text: "Summarize the key topics",
+    icon: "document-text-outline" as const,
+    bg: theme.colors.greenLight,
+    iconBg: theme.colors.greenLightIcon,
+    color: theme.colors.primary,
+  },
+  {
+    text: "Generate 5 practice questions",
+    icon: "help-circle-outline" as const,
+    bg: theme.colors.yellowLight,
+    iconBg: theme.colors.yellowLightIcon,
+    color: theme.colors.onboardingTertiary,
+  },
+  {
+    text: "Explain the main concepts simply",
+    icon: "bulb-outline" as const,
+    bg: theme.colors.blueLight,
+    iconBg: theme.colors.blueLightIcon,
+    color: theme.colors.accentBlue,
+  },
+  {
+    text: "Find the most important keywords",
+    icon: "key-outline" as const,
+    bg: theme.colors.orangeLight,
+    iconBg: theme.colors.orangeLightIcon,
+    color: theme.colors.studioOrange,
+  },
+];
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 export function NotebookChat() {
@@ -380,6 +411,48 @@ export function NotebookChat() {
             >
               Loading messages...
             </Text>
+          </View>
+        ) : messages.length === 0 ? (
+          <View style={styles.emptyStateContainer}>
+            <View style={styles.emptyStateHeader}>
+              <Ionicons
+                name="chatbubbles-outline"
+                size={48}
+                color={theme.colors.primary}
+              />
+              <Text style={styles.emptyStateTitle}>
+                How can I help you today?
+              </Text>
+              <Text style={styles.emptyStateSubtitle}>
+                Ask a question about your sources, request a summary, or quiz
+                yourself.
+              </Text>
+            </View>
+            <View style={styles.suggestionsContainer}>
+              {EMPTY_STATE.map((item, index) => (
+                <Pressable
+                  key={index}
+                  onPress={() => sendMessage(item.text)}
+                  style={({ pressed }) => [
+                    styles.suggestionCard,
+                    { backgroundColor: item.bg },
+                    pressed && styles.suggestionCardPressed,
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.suggestionCardIcon,
+                      { backgroundColor: item.iconBg },
+                    ]}
+                  >
+                    <Ionicons name={item.icon} size={18} color={item.color} />
+                  </View>
+                  <Text numberOfLines={3} style={styles.suggestionCardText}>
+                    {item.text}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
           </View>
         ) : (
           <FlatList

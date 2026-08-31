@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
 import { theme } from "@/theme/themes";
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
@@ -218,5 +218,64 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     color: theme.colors.textMuted,
     marginTop: 2,
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+  emptyStateHeader: {
+    alignItems: "center",
+    marginBottom: 32,
+  },
+  emptyStateTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: theme.colors.textHeading,
+    textAlign: "center",
+    marginTop: 16,
+  },
+  emptyStateSubtitle: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    textAlign: "center",
+    marginTop: 8,
+    lineHeight: 20,
+  },
+  suggestionsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    width: "100%",
+    rowGap: 12,
+  },
+  suggestionCard: {
+    width: "48%",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    borderRadius: 16,
+    padding: 14,
+    minHeight: 110,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  suggestionCardPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.96 }],
+  },
+  suggestionCardIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  suggestionCardText: {
+    fontSize: 12,
+    fontWeight: "600",
+    lineHeight: 16,
+    color: theme.colors.text,
   },
 });

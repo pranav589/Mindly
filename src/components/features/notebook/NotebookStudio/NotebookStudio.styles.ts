@@ -136,6 +136,8 @@ export const styles = StyleSheet.create({
     padding: 18,
     minHeight: 148,
     justifyContent: "flex-end",
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   gridCardPressed: {
     transform: [{ scale: 0.97 }],
