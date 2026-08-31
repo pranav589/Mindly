@@ -4,31 +4,48 @@ import React from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { styles } from "./SourceCard.styles";
 
+const TYPE_ICONS: Record<
+  string,
+  { library: "Ionicons" | "MaterialIcons"; name: string }
+> = {
+  pdf: { library: "MaterialIcons", name: "picture-as-pdf" },
+  youtube: { library: "Ionicons", name: "play-circle-outline" },
+  image: { library: "Ionicons", name: "image-outline" },
+  video: { library: "Ionicons", name: "videocam-outline" },
+  text: { library: "Ionicons", name: "document-text-outline" },
+  transcript: { library: "Ionicons", name: "document-text-outline" },
+};
+
 interface SourceCardProps {
   source: any;
+  onPress: () => void;
   onLongPress: (source: any) => void;
 }
 
-export function SourceCard({ source, onLongPress }: SourceCardProps) {
+export function SourceCard({ source, onPress, onLongPress }: SourceCardProps) {
   const isProcessing =
     source.status === "processing" || source.status === "indexing";
 
+  const iconConfig = TYPE_ICONS[source.type] || {
+    library: "Ionicons",
+    name: "link-outline",
+  };
+  const IconComponent =
+    iconConfig.library === "MaterialIcons" ? MaterialIcons : Ionicons;
+
   return (
     <Pressable
+      onPress={onPress}
       onLongPress={() => onLongPress(source)}
       style={[styles.sourceCard, isProcessing && styles.processingCard]}
     >
       {/* Type Icon */}
       <View style={styles.typeIconContainer}>
-        {source.type === "pdf" ? (
-          <MaterialIcons name="picture-as-pdf" size={20} color={theme.colors.textSecondary} />
-        ) : source.type === "youtube" ? (
-          <Ionicons name="play-circle-outline" size={20} color={theme.colors.textSecondary} />
-        ) : source.type === "image" ? (
-          <Ionicons name="image-outline" size={20} color={theme.colors.textSecondary} />
-        ) : (
-          <Ionicons name="link-outline" size={20} color={theme.colors.textSecondary} />
-        )}
+        <IconComponent
+          name={iconConfig.name as any}
+          size={20}
+          color={theme.colors.textSecondary}
+        />
       </View>
 
       {/* Source Details */}

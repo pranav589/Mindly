@@ -84,6 +84,8 @@ export default function BottomSheet({
             backdropComponent={renderBackdrop}
             backgroundStyle={styles.background}
             handleIndicatorStyle={styles.handleIndicator}
+            keyboardBehavior="interactive"
+            keyboardBlurBehavior="restore"
             style={{
               marginTop: "5%",
             }}

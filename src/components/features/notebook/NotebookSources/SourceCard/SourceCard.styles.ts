@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
 import { theme } from "@/theme/themes";
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   sourceCard: {
@@ -11,11 +11,11 @@ export const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     borderRadius: 24,
     marginBottom: 12,
-    shadowColor: theme.colors.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    // shadowColor: theme.colors.black,
+    // shadowOffset: { width: 0, height: 1 },
+    // shadowOpacity: 0.05,
+    // shadowRadius: 2,
+    // elevation: 1,
   },
   processingCard: {
     borderLeftWidth: 4,

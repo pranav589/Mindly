@@ -126,6 +126,47 @@ export function NotebookSources() {
     });
   };
 
+  const handleGoBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(`/notebook/${id}` as any);
+    }
+  };
+
+  const handleNavigateToChat = () => {
+    router.push(`/notebook/${id}` as any);
+  };
+
+  const handleShowCollaborationAlert = () => {
+    showAlert({
+      title: "Coming Soon",
+      message: "Collaboration features are coming soon!",
+      type: "info",
+    });
+  };
+
+  const handleOpenDrawer = () => setDrawerVisible(true);
+  const handleCloseDrawer = () => setDrawerVisible(false);
+
+  const handleSourcePress = (source: any) => {
+    if (source.status === "completed") {
+      router.push(`/notebook/${id}/source-viewer?sourceId=${source._id}` as any);
+    } else if (source.status === "failed") {
+      showAlert({
+        title: "Sync Failed",
+        message: `Error: ${source.error || "Unknown error occurred"}`,
+        type: "error",
+      });
+    } else {
+      showAlert({
+        title: "Syncing",
+        message: "This source is currently being indexed. Please wait until it's finished.",
+        type: "info",
+      });
+    }
+  };
+
   const containerInsetStyle = { paddingTop: insets.top };
   const scrollContentStyle = { paddingBottom: 100 };
 
@@ -135,13 +176,7 @@ export function NotebookSources() {
 
       <View style={styles.header}>
         <Pressable
-          onPress={() => {
-            if (router.canGoBack()) {
-              router.back();
-            } else {
-              router.replace(`/notebook/${id}` as any);
-            }
-          }}
+          onPress={handleGoBack}
           style={({ pressed }) => [
             styles.headerButton,
             { opacity: pressed ? 0.7 : 1 },
@@ -156,7 +191,7 @@ export function NotebookSources() {
 
         <View style={styles.headerRight}>
           <Pressable
-            onPress={() => router.push(`/notebook/${id}` as any)}
+            onPress={handleNavigateToChat}
             style={({ pressed }) => [
               styles.headerButton,
               styles.chatIcon,
@@ -170,13 +205,7 @@ export function NotebookSources() {
             />
           </Pressable>
           <Pressable
-            onPress={() =>
-              showAlert({
-                title: "Coming Soon",
-                message: "Collaboration features are coming soon!",
-                type: "info",
-              })
-            }
+            onPress={handleShowCollaborationAlert}
             style={({ pressed }) => [
               styles.headerButton,
               { opacity: pressed ? 0.7 : 1 },
@@ -196,7 +225,7 @@ export function NotebookSources() {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Sources</Text>
           <Pressable
-            onPress={() => setDrawerVisible(true)}
+            onPress={handleOpenDrawer}
             style={({ pressed }) => [
               styles.sectionAddButton,
               pressed && styles.sectionAddButtonPressed,
@@ -211,6 +240,7 @@ export function NotebookSources() {
             <SourceCard
               key={source._id}
               source={source}
+              onPress={() => handleSourcePress(source)}
               onLongPress={handleSourceActions}
             />
           ))}
@@ -218,7 +248,7 @@ export function NotebookSources() {
 
         {/* Action Button to Open Drawer */}
         <Pressable
-          onPress={() => setDrawerVisible(true)}
+          onPress={handleOpenDrawer}
           style={({ pressed }) => [
             styles.addNewButton,
             pressed && styles.addNewButtonPressed,
@@ -230,7 +260,7 @@ export function NotebookSources() {
 
         {/* Chat with AI Button */}
         <Button
-          onPress={() => router.push(`/notebook/${id}` as any)}
+          onPress={handleNavigateToChat}
           style={styles.chatButton}
         >
           <Ionicons name="chatbubbles-outline" size={18} color={theme.colors.textLight} />
@@ -241,7 +271,7 @@ export function NotebookSources() {
       {/* ADD SOURCE DRAWERS SUB-COMPONENT */}
       <AddSourceDrawers
         isOpen={drawerVisible}
-        onClose={() => setDrawerVisible(false)}
+        onClose={handleCloseDrawer}
       />
     </View>
   );

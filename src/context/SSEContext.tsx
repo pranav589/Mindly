@@ -334,8 +334,8 @@ export const SSEProvider: React.FC<{
     });
 
     es.addEventListener("error", (event: any) => {
-      console.error(
-        "SSE Connection error:",
+      console.log(
+        "🔌 [SSE] Connection dropped/disconnected:",
         event.message || event.detail || event,
       );
       setStatus("disconnected");

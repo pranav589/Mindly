@@ -1,58 +1,24 @@
-import { apiClient } from "@/services/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { SaveFormat, useImageManipulator } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import { useCustomAlert } from "@/context/CustomAlertContext";
 
-export function useImageSource(notebookId: string, onSuccess?: () => void) {
-  const queryClient = useQueryClient();
+export function useImageSource(
+  notebookId: string,
+  onImagePrepared: (filePayload: { uri: string; name: string; type: string }) => void
+) {
   const { showAlert } = useCustomAlert();
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [originalName, setOriginalName] = useState<string>("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const context = useImageManipulator(imageUri || "");
-
-  const uploadMutation = useMutation({
-    mutationFn: async (filePayload: {
-      uri: string;
-      name: string;
-      type: string;
-    }) => {
-      const formData = new FormData();
-      formData.append("type", "image");
-      formData.append("file", filePayload as any);
-
-      const response = await apiClient.post(
-        `/api/notebooks/${notebookId}/sources`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sources", notebookId] });
-      queryClient.invalidateQueries({ queryKey: ["notebook", notebookId] });
-      if (onSuccess) onSuccess();
-    },
-    onError: (err) => {
-      console.error("[useImageSource] Upload error:", err);
-      showAlert({
-        title: "Error",
-        message: "Failed to upload image source.",
-        type: "error",
-      });
-    },
-  });
 
   useEffect(() => {
     if (!imageUri) return;
 
     const processImage = async () => {
+      setIsProcessing(true);
       try {
         context.resize({ width: 1200 });
 
@@ -74,7 +40,7 @@ export function useImageSource(notebookId: string, onSuccess?: () => void) {
           type: "image/jpeg",
         };
 
-        uploadMutation.mutate(filePayload);
+        onImagePrepared(filePayload);
       } catch (err) {
         console.error("[useImageSource] Manipulation error:", err);
         showAlert({
@@ -85,6 +51,7 @@ export function useImageSource(notebookId: string, onSuccess?: () => void) {
       } finally {
         setImageUri(null);
         setOriginalName("");
+        setIsProcessing(false);
       }
     };
 
@@ -142,7 +109,6 @@ export function useImageSource(notebookId: string, onSuccess?: () => void) {
 
   return {
     uploadImageSource,
-    isUploading: uploadMutation.isPending || !!imageUri,
-    error: uploadMutation.error,
+    isProcessing,
   };
 }

@@ -1,19 +1,32 @@
 import { theme } from "@/theme/themes";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as DocumentPicker from "expo-document-picker";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Text, View, ActivityIndicator } from "react-native";
 import { useCustomAlert } from "@/context/CustomAlertContext";
 import BottomSheet from "@/components/BottomSheet";
 import { useImageSource } from "@/hooks/useImageSource";
 import { apiClient } from "@/services/api";
-import { styles } from "./AddSourceDrawers.styles";
+
+// Import split sub-components
+import { SourceOptionsGrid } from "./SourceOptionsGrid/SourceOptionsGrid";
+import { WebUrlInputForm } from "./WebUrlInputForm/WebUrlInputForm";
+import { YoutubeUrlInputForm } from "./YoutubeUrlInputForm/YoutubeUrlInputForm";
+import { TextInputForm } from "./TextInputForm/TextInputForm";
+import { UploadDetailsForm } from "./UploadDetailsForm/UploadDetailsForm";
 
 interface AddSourceDrawersProps {
   isOpen: boolean;
   onClose: () => void;
+}
+
+interface PendingUpload {
+  type: "pdf" | "youtube" | "web" | "text" | "image" | "video";
+  file?: any;
+  url?: string;
+  text?: string;
+  defaultName: string;
 }
 
 export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
@@ -22,29 +35,49 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
   const { showAlert } = useCustomAlert();
 
   const [activeInputType, setActiveInputType] = useState<
-    "pdf" | "youtube" | "web" | "text" | "camera" | "image" | null
+    "pdf" | "youtube" | "web" | "text" | "camera" | "image" | "video" | null
   >(null);
   const [webUrl, setWebUrl] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [textTitle, setTextTitle] = useState("");
   const [textContent, setTextContent] = useState("");
 
-  const { uploadImageSource, isUploading } = useImageSource(
+  const [pendingUpload, setPendingUpload] = useState<PendingUpload | null>(null);
+  const [sourceName, setSourceName] = useState("");
+  const [sourceDescription, setSourceDescription] = useState("");
+
+  const onImagePrepared = (filePayload: any) => {
+    const defaultName = filePayload.name ? filePayload.name.split(".")[0] : "Scan Image";
+    setPendingUpload({
+      type: "image",
+      file: filePayload,
+      defaultName,
+    });
+    setSourceName(defaultName);
+    setSourceDescription("");
+    setActiveInputType(null);
+  };
+
+  const { uploadImageSource, isProcessing: isImageProcessing } = useImageSource(
     id as string,
-    onClose
+    onImagePrepared
   );
 
   const createSourceMutation = useMutation({
     mutationFn: async (payload: {
       type: string;
-      name?: string;
+      name: string;
+      description?: string;
       text?: string;
       url?: string;
       file?: any;
     }) => {
       const formData = new FormData();
       formData.append("type", payload.type);
-      if (payload.name) formData.append("name", payload.name);
+      formData.append("name", payload.name);
+      if (payload.description) {
+        formData.append("description", payload.description);
+      }
       if (payload.text) formData.append("text", payload.text);
       if (payload.url) formData.append("url", payload.url);
       if (payload.file) {
@@ -65,11 +98,15 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sources", id] });
       queryClient.invalidateQueries({ queryKey: ["notebook", id] });
+      
       // Reset inputs & close
       setWebUrl("");
       setYoutubeUrl("");
       setTextTitle("");
       setTextContent("");
+      setPendingUpload(null);
+      setSourceName("");
+      setSourceDescription("");
       setActiveInputType(null);
       onClose();
     },
@@ -99,12 +136,15 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
           type: asset.mimeType || "application/pdf",
         };
 
-        onClose();
-
-        createSourceMutation.mutate({
+        const defaultName = asset.name ? asset.name.split(".")[0] : "Document";
+        setPendingUpload({
           type: "pdf",
           file: filePayload,
+          defaultName,
         });
+        setSourceName(defaultName);
+        setSourceDescription("");
+        setActiveInputType(null);
       }
     } catch (error) {
       console.error("Error picking document:", error);
@@ -116,9 +156,43 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
     }
   };
 
+  const handlePickVideo = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "video/*",
+        copyToCacheDirectory: true,
+      });
 
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const asset = result.assets[0];
 
-  const submitWebUrl = () => {
+        const filePayload = {
+          uri: asset.uri,
+          name: asset.name || "video.mp4",
+          type: asset.mimeType || "video/mp4",
+        };
+
+        const defaultName = asset.name ? asset.name.split(".")[0] : "Video";
+        setPendingUpload({
+          type: "video",
+          file: filePayload,
+          defaultName,
+        });
+        setSourceName(defaultName);
+        setSourceDescription("");
+        setActiveInputType(null);
+      }
+    } catch (error) {
+      console.error("Error picking video:", error);
+      showAlert({
+        title: "Error",
+        message: "Failed to select video file",
+        type: "error",
+      });
+    }
+  };
+
+  const handleWebUrlNext = () => {
     if (!webUrl.trim()) {
       showAlert({
         title: "Error",
@@ -127,14 +201,24 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
       });
       return;
     }
-    createSourceMutation.mutate({
-      type: "url",
-      url: webUrl,
-      name: webUrl.split("/").pop() || "Web URL",
+    const cleanUrl = webUrl.trim();
+    let defaultName = "Web Page";
+    try {
+      const urlObj = new URL(cleanUrl);
+      defaultName = urlObj.hostname || "Web Page";
+    } catch (e) {}
+
+    setPendingUpload({
+      type: "web",
+      url: cleanUrl,
+      defaultName,
     });
+    setSourceName(defaultName);
+    setSourceDescription("");
+    setActiveInputType(null);
   };
 
-  const submitYoutubeUrl = () => {
+  const handleYoutubeUrlNext = () => {
     if (!youtubeUrl.trim()) {
       showAlert({
         title: "Error",
@@ -143,14 +227,17 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
       });
       return;
     }
-    createSourceMutation.mutate({
+    setPendingUpload({
       type: "youtube",
-      url: youtubeUrl,
-      name: youtubeUrl,
+      url: youtubeUrl.trim(),
+      defaultName: "YouTube Video",
     });
+    setSourceName("YouTube Video");
+    setSourceDescription("");
+    setActiveInputType(null);
   };
 
-  const submitText = () => {
+  const handleTextNext = () => {
     if (!textTitle.trim() || !textContent.trim()) {
       showAlert({
         title: "Error",
@@ -159,24 +246,57 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
       });
       return;
     }
-    createSourceMutation.mutate({
+    setPendingUpload({
       type: "text",
-      name: textTitle,
-      text: textContent,
+      text: textContent.trim(),
+      defaultName: textTitle.trim(),
+    });
+    setSourceName(textTitle.trim());
+    setSourceDescription("");
+    setActiveInputType(null);
+  };
+
+  const submitPendingUpload = () => {
+    if (!pendingUpload) return;
+    if (!sourceName.trim()) {
+      showAlert({
+        title: "Error",
+        message: "Source name is required",
+        type: "error",
+      });
+      return;
+    }
+
+    createSourceMutation.mutate({
+      type: pendingUpload.type === "web" ? "url" : pendingUpload.type,
+      name: sourceName.trim(),
+      description: sourceDescription.trim() || undefined,
+      url: pendingUpload.url,
+      text: pendingUpload.text,
+      file: pendingUpload.file,
     });
   };
 
   const handleClose = () => {
     setActiveInputType(null);
+    setPendingUpload(null);
+    setSourceName("");
+    setSourceDescription("");
     onClose();
   };
 
   let drawerTitle = "Add Source";
-  if (activeInputType === "web") drawerTitle = "Add Web URL";
-  else if (activeInputType === "youtube") drawerTitle = "Add YouTube Link";
-  else if (activeInputType === "text") drawerTitle = "Paste Text Content";
+  if (pendingUpload !== null) {
+    drawerTitle = `Source Details (${pendingUpload.type.toUpperCase()})`;
+  } else if (activeInputType === "web") {
+    drawerTitle = "Add Web URL";
+  } else if (activeInputType === "youtube") {
+    drawerTitle = "Add YouTube Link";
+  } else if (activeInputType === "text") {
+    drawerTitle = "Paste Text Content";
+  }
 
-  const isDrawerOpen = isOpen || activeInputType !== null;
+  const isDrawerOpen = isOpen || activeInputType !== null || pendingUpload !== null;
 
   return (
     <BottomSheet
@@ -184,163 +304,57 @@ export function AddSourceDrawers({ isOpen, onClose }: AddSourceDrawersProps) {
       onClose={handleClose}
       title={drawerTitle}
     >
-      {activeInputType === null && (
-        <View style={styles.sourceGrid}>
-          {/* PDF button */}
-          <Pressable
-            onPress={handlePickPdf}
-            style={({ pressed }) => [
-              styles.sourceButton,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
-          >
-            <View style={styles.sourceIconContainer}>
-              <MaterialIcons name="picture-as-pdf" size={24} color={theme.colors.primary} />
-            </View>
-            <Text style={styles.sourceButtonText}>Upload PDF</Text>
-          </Pressable>
-
-          {/* YouTube button */}
-          <Pressable
-            onPress={() => {
-              setActiveInputType("youtube");
-            }}
-            style={({ pressed }) => [
-              styles.sourceButton,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
-          >
-            <View style={styles.sourceIconContainer}>
-              <Ionicons name="play-circle-outline" size={24} color={theme.colors.primary} />
-            </View>
-            <Text style={styles.sourceButtonText}>YouTube Link</Text>
-          </Pressable>
-
-          {/* Web URL button */}
-          <Pressable
-            onPress={() => {
-              setActiveInputType("web");
-            }}
-            style={({ pressed }) => [
-              styles.sourceButton,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
-          >
-            <View style={styles.sourceIconContainer}>
-              <Ionicons name="link-outline" size={24} color={theme.colors.primary} />
-            </View>
-            <Text style={styles.sourceButtonText}>Web URL</Text>
-          </Pressable>
-
-          {/* Text button */}
-          <Pressable
-            onPress={() => {
-              setActiveInputType("text");
-            }}
-            style={({ pressed }) => [
-              styles.sourceButton,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
-          >
-            <View style={styles.sourceIconContainer}>
-              <Ionicons
-                name="document-text-outline"
-                size={24}
-                color={theme.colors.primary}
-              />
-            </View>
-            <Text style={styles.sourceButtonText}>Paste Text</Text>
-          </Pressable>
-
-          {/* Camera scan button */}
-          <Pressable
-            onPress={() => uploadImageSource("camera")}
-            style={({ pressed }) => [
-              styles.sourceButton,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
-          >
-            <View style={styles.sourceIconContainer}>
-              <Ionicons name="camera-outline" size={24} color={theme.colors.primary} />
-            </View>
-            <Text style={styles.sourceButtonText}>Scan (Camera)</Text>
-          </Pressable>
-
-          {/* Gallery image button */}
-          <Pressable
-            onPress={() => uploadImageSource("image")}
-            style={({ pressed }) => [
-              styles.sourceButton,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
-          >
-            <View style={styles.sourceIconContainer}>
-              <Ionicons name="images-outline" size={24} color={theme.colors.primary} />
-            </View>
-            <Text style={styles.sourceButtonText}>Select Image</Text>
-          </Pressable>
+      {isImageProcessing && (
+        <View style={{ padding: 24, alignItems: "center" }}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={{ marginTop: 12, color: theme.colors.textMuted }}>Processing captured image...</Text>
         </View>
       )}
 
-      {activeInputType === "web" && (
-        <View>
-          <TextInput
-            placeholder="https://example.com/article"
-            placeholderTextColor={theme.colors.textMuted}
-            value={webUrl}
-            onChangeText={setWebUrl}
-            style={styles.drawerInput}
-            autoCapitalize="none"
-            keyboardType="url"
-          />
-          <Pressable onPress={submitWebUrl} style={styles.drawerSubmitButton}>
-            <Text style={styles.drawerSubmitButtonText}>Add Source</Text>
-          </Pressable>
-        </View>
+      {!isImageProcessing && pendingUpload !== null && (
+        <UploadDetailsForm
+          name={sourceName}
+          description={sourceDescription}
+          onChangeName={setSourceName}
+          onChangeDescription={setSourceDescription}
+          onSubmit={submitPendingUpload}
+          isPending={createSourceMutation.isPending}
+        />
       )}
 
-      {activeInputType === "youtube" && (
-        <View>
-          <TextInput
-            placeholder="https://youtube.com/watch?v=..."
-            placeholderTextColor={theme.colors.textMuted}
-            value={youtubeUrl}
-            onChangeText={setYoutubeUrl}
-            style={styles.drawerInput}
-            autoCapitalize="none"
-            keyboardType="url"
-          />
-          <Pressable
-            onPress={submitYoutubeUrl}
-            style={styles.drawerSubmitButton}
-          >
-            <Text style={styles.drawerSubmitButtonText}>Add Source</Text>
-          </Pressable>
-        </View>
+      {!isImageProcessing && pendingUpload === null && activeInputType === null && (
+        <SourceOptionsGrid
+          onPickPdf={handlePickPdf}
+          onPickVideo={handlePickVideo}
+          onSelectType={(type) => setActiveInputType(type)}
+          onSelectImageSource={(mode) => uploadImageSource(mode)}
+        />
       )}
 
-      {activeInputType === "text" && (
-        <View>
-          <TextInput
-            placeholder="Title (e.g. Lecture Notes)"
-            placeholderTextColor={theme.colors.textMuted}
-            value={textTitle}
-            onChangeText={setTextTitle}
-            style={styles.drawerInputTitle}
-          />
-          <TextInput
-            placeholder="Paste or type content here..."
-            placeholderTextColor={theme.colors.textMuted}
-            value={textContent}
-            onChangeText={setTextContent}
-            style={styles.drawerInputContent}
-            multiline={true}
-            textAlignVertical="top"
-          />
-          <Pressable onPress={submitText} style={styles.drawerSubmitButton}>
-            <Text style={styles.drawerSubmitButtonText}>Add Source</Text>
-          </Pressable>
-        </View>
+      {!isImageProcessing && pendingUpload === null && activeInputType === "web" && (
+        <WebUrlInputForm
+          value={webUrl}
+          onChangeText={setWebUrl}
+          onSubmit={handleWebUrlNext}
+        />
+      )}
+
+      {!isImageProcessing && pendingUpload === null && activeInputType === "youtube" && (
+        <YoutubeUrlInputForm
+          value={youtubeUrl}
+          onChangeText={setYoutubeUrl}
+          onSubmit={handleYoutubeUrlNext}
+        />
+      )}
+
+      {!isImageProcessing && pendingUpload === null && activeInputType === "text" && (
+        <TextInputForm
+          title={textTitle}
+          content={textContent}
+          onChangeTitle={setTextTitle}
+          onChangeContent={setTextContent}
+          onSubmit={handleTextNext}
+        />
       )}
     </BottomSheet>
   );
